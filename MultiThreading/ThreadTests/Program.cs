@@ -7,7 +7,7 @@
     {
         static void Main(string[] args)
         {
-            Thread_Priority();
+            ThreadSync_Monitors_Example_01();
         }
 
         /// <summary>
@@ -279,10 +279,13 @@
         /// </remarks>
         public static void Thread_Exception()
         {
+            // 没有对异常进行处理
             static void ThreadMethodA()
             {
                 throw new Exception("AError");
             }
+
+            // 对异常进行处理
             static void ThreadMethodB()
             {
                 try
@@ -331,5 +334,195 @@
             }
             Console.WriteLine($"{workThread},{ioThread}");
         }
+
+        /// <summary>
+        /// 多线程争用条件
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public static void Thread_Contention_Example_01()
+        {
+            StateObject m = new StateObject();
+            Thread t1 = new Thread(ChangeState);
+            t1.Start(m);
+            Console.ReadKey();
+
+            static void ChangeState(object o)
+            {
+                StateObject m = o as StateObject;
+                while (true)
+                {
+                    m.ChangeState();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 多线程争用条件
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public static void Thread_Contention_Example_02()
+        {
+            StateObject m = new StateObject();
+            Thread t1 = new Thread(ChangeState);
+            Thread t2 = new Thread(ChangeState);
+            t1.Start(m);
+            t2.Start(m);
+            Console.ReadKey();
+
+            static void ChangeState(object o)
+            {
+                StateObject m = o as StateObject;
+                while (true)
+                {
+                    m.ChangeState();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 多线程死锁
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public static void Thread_Deadly_Example_01()
+        {
+            Thread t1 = new Thread(Deadlock.DeadlockA);
+            Thread t2 = new Thread(Deadlock.DeadlockB);
+            t1.Start("t1");
+            t2.Start("t2");
+        }
+
+        /// <summary>
+        /// 线程同步(Lock)
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public static void ThreadSync_Lock_Example_01()
+        {
+            StateObject m = new StateObject();
+            Thread t1 = new Thread(ChangeState);
+            t1.Start(m);
+            Console.ReadKey();
+
+            static void ChangeState(object o)
+            {
+                StateObject m = o as StateObject;
+                while (true)
+                {
+                    //给变量m加锁
+                    lock (m)
+                    {
+                        m.ChangeState();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 线程同步(Lock)
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public static void ThreadSync_Lock_Example_02()
+        {
+            StateObject m = new StateObject();
+            Thread t1 = new Thread(ChangeState);
+            t1.Start(m);
+            Console.ReadKey();
+
+            static void ChangeState(object o)
+            {
+                object syncRoot = new object();
+
+                StateObject m = o as StateObject;
+                while (true)
+                {
+                    lock (syncRoot)
+                    {
+                        m.ChangeState();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 线程同步(Monitors)
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public static void ThreadSync_Monitors_Example_01()
+        {
+            StateObject m = new StateObject();
+            Thread t1 = new Thread(ChangeState);
+            t1.Start(m);
+            Console.ReadKey();
+
+            static void ChangeState(object o)
+            {
+                object syncRoot = new object();
+
+                StateObject m = o as StateObject;
+                while (true)
+                {
+                    Monitor.Enter(syncRoot);
+                    try
+                    {
+                        m.ChangeState();
+                    }
+                    finally
+                    {
+                        Monitor.Exit(syncRoot);
+                    }
+                }
+            }
+        }
+    }
+
+    class StateObject
+    {
+        private int state = 5;
+
+        public void ChangeState()
+        {
+            state++;
+            if (state == 5)
+            {
+                Console.WriteLine("value=5");
+            }
+            state = 5;
+        }
+    }
+
+    static class Deadlock
+    {
+        static readonly StateObject o1 = new StateObject();
+        static readonly StateObject o2 = new StateObject();
+
+        public static void DeadlockA(object o)
+        {
+            lock (o1)
+            {
+                Console.WriteLine("我是线程{0},我锁定了对象o1", o);
+                lock (o2)
+                {
+                    Console.WriteLine("我是线程{0},我锁定了对象o2", o);
+                }
+            }
+        }
+
+        public static void DeadlockB(object o)
+        {
+            lock (o2)
+            {
+                Console.WriteLine("我是线程{0},我锁定了对象o2", o);
+                lock (o1)
+                {
+                    Console.WriteLine("我是线程{0},我锁定了对象o1", o);
+                }
+            }
+        }
     }
 }
+
