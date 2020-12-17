@@ -164,7 +164,7 @@
             // 使用预定义的共享池
             ArrayPool<int> sharePool = ArrayPool<int>.Shared;
             Console.WriteLine($"{arrayPool},{sharePool}");
-            Assert.IsTrue(true);
+            Assert.IsTrue(sharePool != null);
         }
     }
 }

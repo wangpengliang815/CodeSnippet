@@ -7,7 +7,7 @@
     {
         static void Main(string[] args)
         {
-            ThreadSync_Monitors_Example_01();
+            ThreadSync_Mutex_Example_01();
         }
 
         /// <summary>
@@ -242,7 +242,9 @@
             Thread t = new Thread(ThreadMethodSleep);
             t.Start();
             Thread.Sleep(TimeSpan.FromSeconds(5));
+#pragma warning disable SYSLIB0006 // 类型或成员已过时
             t.Abort();
+#pragma warning restore SYSLIB0006 // 类型或成员已过时
         }
 
         /// <summary>
@@ -476,6 +478,36 @@
                         Monitor.Exit(syncRoot);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 线程同步(Mutex)
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        public static void ThreadSync_Mutex_Example_01()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                //在不同的线程中调用受互斥锁保护的方法
+                Thread test = new Thread(MutexMethod);
+                test.Start();
+            }
+            Console.Read();
+
+            static void MutexMethod()
+            {
+                //实例化一个互斥锁
+                Mutex mutex = new Mutex();
+
+                Console.WriteLine("{0} 请求获取互斥锁", Thread.CurrentThread.ManagedThreadId);
+                mutex.WaitOne();
+                Console.WriteLine("{0} 已获取到互斥锁", Thread.CurrentThread.ManagedThreadId);
+                Console.WriteLine("{0} 准备释放互斥锁", Thread.CurrentThread.ManagedThreadId);
+                // 释放互斥锁
+                mutex.ReleaseMutex();
+                Console.WriteLine("{0} 已经释放互斥锁", Thread.CurrentThread.ManagedThreadId);
             }
         }
     }
