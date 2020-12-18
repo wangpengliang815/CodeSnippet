@@ -175,7 +175,7 @@ namespace CodeSnippet.Csharp
         [TestMethod]
         public void Task_TaskCreationOptions_Example()
         {
-            var t1 = new Task(()=> TaskMethod("t1"), TaskCreationOptions.LongRunning);
+            var t1 = new Task(() => TaskMethod("t1"), TaskCreationOptions.LongRunning);
             t1.Start();
             Console.WriteLine("主线程调用结束");
 
@@ -186,6 +186,108 @@ namespace CodeSnippet.Csharp
             }
 
             Assert.IsNotNull(t1);
+        }
+
+        /// <summary>
+        /// 不关心结果返回Void
+        /// </summary>
+        [TestMethod]
+        public void Task_Return_Void()
+        {
+            Console.WriteLine($"不关心结果,返回Void,--Start,线程Id:{Thread.CurrentThread.ManagedThreadId}");
+            Print();
+            Console.WriteLine($"不关心结果,返回Void,--End,线程Id:{Thread.CurrentThread.ManagedThreadId}");
+            Assert.IsTrue(true);
+
+            static async void Print()
+            {
+                await Task.Run(() =>
+               {
+                   Console.WriteLine($"Hello, 线程Id:{ Thread.CurrentThread.ManagedThreadId}");
+               });
+            }
+        }
+
+        /// <summary>
+        /// 关心是否完成，返回 Task 类型
+        /// </summary>
+        [TestMethod]
+        public void Task_Return_Task()
+        {
+            Console.WriteLine($"看电视中...,线程Id:{Thread.CurrentThread.ManagedThreadId}");
+            Console.WriteLine("突然停电，看下是不是跳闸了");
+            var task = OpenMainsSwitch();
+            Console.WriteLine($"没电了先玩会儿手机吧，线程Id为：{Thread.CurrentThread.ManagedThreadId}");
+            Thread.Sleep(100);
+            // 等着电源开关被打开
+            task.Wait();
+            Console.WriteLine($"又有电了,继续看电视...,线程Id:{Thread.CurrentThread.ManagedThreadId}");
+            Assert.IsTrue(true);
+
+
+            static async Task OpenMainsSwitch()
+            {
+                Console.WriteLine($"准备打开电源开关，线程Id：{ Thread.CurrentThread.ManagedThreadId}");
+                await Task.Run(() =>
+                {
+                    Console.WriteLine($"打开电源开关, 线程Id:{ Thread.CurrentThread.ManagedThreadId}");
+                    Thread.Sleep(2000);
+                });
+                Console.WriteLine($"电源开关打开了，线程Id：{ Thread.CurrentThread.ManagedThreadId}");
+            }
+        }
+
+        /// <summary>
+        /// 不止关心是否执行完成，还要获取执行结果。返回 Task<TResult> 类型
+        /// </summary>
+        [TestMethod]
+        public async Task Task_Return_TaskTAsync()
+        {
+            string message = $"Today is {DateTime.Today:D}\n" + "Today's hours of leisure: " + $"{await GetLeisureHoursAsync()}";
+            Console.WriteLine(message);
+            Assert.IsTrue(true);
+
+            static async Task<int> GetLeisureHoursAsync()
+            {
+                DayOfWeek today = await Task.FromResult(DateTime.Now.DayOfWeek);
+
+                int leisureHours =
+                    today is DayOfWeek.Saturday || today is DayOfWeek.Sunday
+                    ? 16 : 5;
+
+                return leisureHours;
+            }
+        }
+
+        /// <summary>
+        /// 连续Task
+        /// </summary>
+        [TestMethod]
+        public void Task_ContinueWith_Example()
+        {
+            Task<string> t1 = new Task<string>(
+                () => TaskMethod1("t1"));
+            Console.WriteLine("Task1-创建,状态为:{0}", t1.Status);
+            t1.Start();
+            Console.WriteLine("Task1-启动,状态为:{0}", t1.Status);
+            Console.WriteLine(t1.Result);
+            Console.WriteLine("Task1-完成,状态为:{0}", t1.Status);
+            Task t2 = t1.ContinueWith(TaskMethod2);
+            Console.WriteLine("Task2,状态为:{0}", t2.Status);
+
+            static string TaskMethod1(string taskName)
+            {
+                var result = string.Format($"Task:{taskName} 运行在线程id:{ Thread.CurrentThread.ManagedThreadId}的线程上," +
+                    $"是否是线程池中线程？:{Thread.CurrentThread.IsThreadPoolThread}");
+                return result;
+            }
+
+            static void TaskMethod2(Task t)
+            {
+                Console.WriteLine($"TaskID:{ t.Id} 运行在线程id:{Thread.CurrentThread.ManagedThreadId}的线程上。是否是线程池中线程？:{Thread.CurrentThread.IsThreadPoolThread}");
+
+            }
+            Assert.IsTrue(true);
         }
     }
 }
