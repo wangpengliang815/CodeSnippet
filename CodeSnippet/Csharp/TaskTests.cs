@@ -289,5 +289,194 @@ namespace CodeSnippet.Csharp
             }
             Assert.IsTrue(true);
         }
+
+        /// <summary>
+        /// 嵌套Task(非关联)
+        /// </summary>
+        [TestMethod]
+        public void Task_NoRelevance_Example()
+        {
+            var pTask = Task.Factory.StartNew(() =>
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    Console.WriteLine("Childen task finished!");
+                });
+                Console.WriteLine("Parent task finished!");
+            });
+            pTask.Wait();
+            Console.WriteLine("Flag");
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// 嵌套Task(关联)
+        /// </summary>
+        [TestMethod]
+        public void Task_Relevance_Example()
+        {
+            var pTask = Task.Factory.StartNew(() =>
+            {
+                Task.Factory.StartNew(() =>
+                 {
+                     Console.WriteLine("Childen task finished!");
+                 }, TaskCreationOptions.AttachedToParent);
+                Console.WriteLine("Parent task finished!");
+            });
+            pTask.Wait();
+            Console.WriteLine("Flag");
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// Task取消单个Task
+        /// </summary>
+        [TestMethod]
+        public void Task_CancellationToken_SingleTask_Example()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            Task t1 = Task.Run(() =>
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    if (cts.Token.IsCancellationRequested)
+                    {
+                        cts.Token.ThrowIfCancellationRequested();
+                    }
+                    else
+                    {
+                        Thread.Sleep(500);
+                        Console.WriteLine("任务t1,共执行30次,当前第{0}次", i + 1);
+                    }
+                }
+            }, cts.Token);
+            Thread.Sleep(2000);
+            // 传达取消请求
+            cts.Cancel();
+            Console.WriteLine($"已停止,Status{t1.Status}");
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// Task取消多个Task
+        /// </summary>
+        [TestMethod]
+        public void Task_CancellationToken_MultiTask_Example()
+        {
+            CancellationTokenSource cts1 = new CancellationTokenSource();
+            CancellationTokenSource cts2 = new CancellationTokenSource();
+
+            // 任何Task处于取消状态时其余也将取消
+            CancellationTokenSource ctsCombine =
+                 CancellationTokenSource.CreateLinkedTokenSource(cts1.Token, cts2.Token);
+            Task t1 = Task.Run(() =>
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    if (!ctsCombine.IsCancellationRequested)
+                    {
+                        Thread.Sleep(500);
+                        Console.WriteLine("任务t1,共执行30次,当前第{0}次", i + 1);
+                    }
+                }
+            }, ctsCombine.Token);
+
+            Task t2 = Task.Run(() =>
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    if (!ctsCombine.IsCancellationRequested)
+                    {
+                        Thread.Sleep(500);
+                        Console.WriteLine("任务t2,共执行30次,当前第{0}次", i + 1);
+                    }
+                }
+            }, ctsCombine.Token);
+            Thread.Sleep(2000);
+            cts1.Cancel();
+            Console.WriteLine($"t1:Status_{t1.Status},t2:Status_{t2.Status}");
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// Task定时取消
+        /// </summary>
+        [TestMethod]
+        public void Task_CancellationToken_Timing_Example()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            cts.CancelAfter(8000);
+            Task t1 = Task.Run(() =>
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    if (cts.Token.IsCancellationRequested)
+                    {
+                        cts.Token.ThrowIfCancellationRequested();
+                    }
+                    else
+                    {
+                        Thread.Sleep(500);
+                        Console.WriteLine("任务t1,共执行30次,当前第{0}次", i);
+                    }
+                }
+            }, cts.Token);
+            try
+            {
+                t1.Wait();
+            }
+            catch (AggregateException e)
+            {
+                foreach (var item in e.InnerExceptions)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// CancellationToken回调
+        /// </summary>
+        [TestMethod]
+        public void Task_CancellationToken_Register_Example()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            var token = cts.Token;
+            cts.CancelAfter(8000);
+            token.Register(Callback);
+            Task t1 = Task.Run(() =>
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
+                    else
+                    {
+                        Thread.Sleep(500);
+                        Console.WriteLine("任务t1,共执行30次,当前第{0}次", i);
+                    }
+                }
+            }, token);
+
+            try
+            {
+                t1.Wait();
+            }
+            catch (AggregateException e)
+            {
+                foreach (var item in e.InnerExceptions)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            static void Callback()
+            {
+                Console.WriteLine("Register登记的任务取消回调函数");
+            }
+            Assert.IsTrue(true);
+        }
     }
 }
