@@ -19,8 +19,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Autofac\**" />
     <Compile Remove="Basics\**" />
+    <EmbeddedResource Remove="Autofac\**" />
     <EmbeddedResource Remove="Basics\**" />
+    <None Remove="Autofac\**" />
     <None Remove="Basics\**" />
   </ItemGroup>
 
@@ -33,11 +36,6 @@
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Faker.Net" Version="1.4.108" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Autofac\" />
-    <Folder Include="EntityFrameworkCore\" />
   </ItemGroup>
 
 </Project>
