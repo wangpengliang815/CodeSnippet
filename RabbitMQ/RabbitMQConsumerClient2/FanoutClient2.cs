@@ -5,6 +5,7 @@
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
 
+    /// <summary>FanoutClient2</summary>
     static class FanoutClient2
     {
         static void Main(string[] args)
