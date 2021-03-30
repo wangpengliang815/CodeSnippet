@@ -4,13 +4,13 @@
     using System.Text;
     using RabbitMQ.Client;
 
-    static class ExchangeTopicPublisher
+    static class Direct
     {
         static void Main(string[] args)
         {
             while (true)
             {
-                Console.WriteLine("Publisher(topic):Input Message Content:");
+                Console.WriteLine("Publisher(direct):Input Message Content:");
                 string message = Console.ReadLine();
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -29,14 +29,14 @@
                     using var connection = factory.CreateConnection();
                     using var channel = connection.CreateModel();
 
-                    string exchangeName = $"testExchange_topic";
+                    string exchangeName = $"testExchange_direct";
 
-                    string routeKeyName = "testExchange_routeKey.*";
+                    string routeKeyName = "testExchange_routeKey";
 
-                    // 声明交换机并设置类型为topic
+                    // 声明交换机并设置类型为direct
                     channel.ExchangeDeclare(
                         exchange: exchangeName,
-                        type: "topic");
+                        type: "direct");
 
                     byte[] body = Encoding.UTF8.GetBytes(message);
 

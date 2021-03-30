@@ -4,13 +4,16 @@
     using System.Text;
     using RabbitMQ.Client;
 
-    static class ExchangeDirectPublisher
+    /// <summary>
+    /// Exchange-发布订阅模式(fanout)
+    /// </summary>
+    static class Fanout
     {
         static void Main(string[] args)
         {
             while (true)
             {
-                Console.WriteLine("Publisher(direct):Input Message Content:");
+                Console.WriteLine("Publisher(fanout):Input Message Content:");
                 string message = Console.ReadLine();
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -29,20 +32,17 @@
                     using var connection = factory.CreateConnection();
                     using var channel = connection.CreateModel();
 
-                    string exchangeName = $"testExchange_direct";
-
-                    string routeKeyName = "testExchange_routeKey";
-
-                    // 声明交换机并设置类型为direct
+                    string exchangeName = $"test.rabbitMq.worker";
+                    // 声明交换机
                     channel.ExchangeDeclare(
                         exchange: exchangeName,
-                        type: "direct");
+                        type: "fanout");
 
                     byte[] body = Encoding.UTF8.GetBytes(message);
 
                     channel.BasicPublish(
                         exchange: exchangeName,
-                        routingKey: routeKeyName,
+                        routingKey: "",
                         basicProperties: null,
                         body: body);
                 }

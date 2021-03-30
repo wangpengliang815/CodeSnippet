@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <StartupObject>RabbitMQConsumerClient2.ExchangeDirectConsumerClient2</StartupObject>
+    <StartupObject>RabbitMQConsumerClient2.WorkerClient2</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

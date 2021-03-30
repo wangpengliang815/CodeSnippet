@@ -4,17 +4,16 @@
     using System.Text;
     using RabbitMQ.Client;
 
-    static class WorkerPublisher
+    static class Topic
     {
         static void Main(string[] args)
         {
             while (true)
             {
-                Console.WriteLine("Publisher(Worker):Input Message Content:");
+                Console.WriteLine("Publisher(topic):Input Message Content:");
                 string message = Console.ReadLine();
                 if (!string.IsNullOrEmpty(message))
                 {
-                    // RabbitMQ连接工厂
                     var factory = new ConnectionFactory()
                     {
                         HostName = "localhost",
@@ -27,19 +26,23 @@
                         // 心跳处理
                         RequestedHeartbeat = new TimeSpan(5000)
                     };
-                    // 建立连接
                     using var connection = factory.CreateConnection();
-                    // 创建信道
                     using var channel = connection.CreateModel();
-                    // 创建名称为hello的队列
-                    channel.QueueDeclare("hello", false, false, false, null);
-                    // 构建消息数据包
+
+                    string exchangeName = $"testExchange_topic";
+
+                    string routeKeyName = "testExchange_routeKey.*";
+
+                    // 声明交换机并设置类型为topic
+                    channel.ExchangeDeclare(
+                        exchange: exchangeName,
+                        type: "topic");
+
                     byte[] body = Encoding.UTF8.GetBytes(message);
 
-                    // 消息发送
                     channel.BasicPublish(
-                        exchange: "",
-                        routingKey: "hello",
+                        exchange: exchangeName,
+                        routingKey: routeKeyName,
                         basicProperties: null,
                         body: body);
                 }

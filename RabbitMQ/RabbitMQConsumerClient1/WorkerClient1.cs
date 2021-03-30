@@ -2,14 +2,15 @@
 {
     using System;
     using System.Text;
+
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
 
-    static class WorkerConsumerClient1
+    static class WorkerClient1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine($"{nameof(WorkerConsumerClient1)}:");
+            Console.WriteLine($"{nameof(WorkerClient1)}:");
             // RabbitMQ连接工厂
             var factory = new ConnectionFactory()
             {
@@ -28,7 +29,7 @@
             // 创建信道
             using var channel = connection.CreateModel();
 
-            string queueName = "hello";
+            string queueName = "test.rabbitMq.worker.queue";
             // 申明队列
             channel.QueueDeclare(
                 queue: queueName,
