@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <StartupObject>RabbitMQPublisher.Worker</StartupObject>
+    <StartupObject>RabbitMQPublisher.Topic</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

@@ -5,14 +5,16 @@
 
     using RabbitMQ.Client;
 
-    /// <summary>Worker模式:信息以顺序的传输给每个接收者</summary>
+    /// <summary>
+    /// Worker模式:信息以顺序的传输给每个接收者(fanout)
+    /// </summary>
     static class Worker
     {
         static void Main(string[] args)
         {
             while (true)
             {
-                Console.WriteLine("Publisher(Worker):Input Message Content:");
+                Console.WriteLine("消息发布者:模式{Worker}=>输入消息内容");
                 string message = Console.ReadLine();
                 if (!string.IsNullOrEmpty(message))
                 {
@@ -34,11 +36,9 @@
                     // 创建信道
                     using var channel = connection.CreateModel();
 
-                    string queueName = "test.rabbitMq.worker.queue";
-                    // 创建队列
+                    // 声明队列
+                    string queueName = "test.worker.queue";
                     channel.QueueDeclare(queueName, false, false, false, null);
-                    // 构建消息数据包
-                    byte[] body = Encoding.UTF8.GetBytes(message);
 
                     // 消息发送
                     channel.BasicPublish(
@@ -46,7 +46,7 @@
                         // Worker模式下routingKey不写无法将消息发送到queue
                         routingKey: queueName,
                         basicProperties: null,
-                        body: body);
+                        body: Encoding.UTF8.GetBytes(message));
                 }
             }
         }
