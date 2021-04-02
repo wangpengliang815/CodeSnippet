@@ -6,11 +6,11 @@
     using RabbitMQ.Client.Events;
 
     /// <summary>FanoutClient2</summary>
-    static class FanoutClient2
+    static class FanoutConsumerClient2
     {
         static void Main(string[] args)
         {
-            Console.WriteLine($"{nameof(FanoutClient2)}:");
+            Console.WriteLine($"{nameof(FanoutConsumerClient2)}:");
             // RabbitMQ连接工厂
             var factory = new ConnectionFactory()
             {
@@ -35,7 +35,7 @@
                 exchange: exchangeName,
                 type: "fanout");
 
-            string queueName = $"{exchangeName}_{nameof(FanoutClient2)}";
+            string queueName = $"{exchangeName}_{nameof(FanoutConsumerClient2)}";
             //声明队列
             channel.QueueDeclare(queue: queueName,
                 durable: false,

@@ -5,10 +5,10 @@
     using RabbitMQ.Client;
 
     /// <summary>
-    /// w路由模式(direct),消息会发送到exchange
+    /// 路由模式(direct),消息会发送到exchange
     /// 所有订阅了当前Exchange并且routingKey完全匹配的Queue都可以收到消息
     /// </summary>
-    static class Direct
+    static class DirectPublisher
     {
         static void Main(string[] args)
         {

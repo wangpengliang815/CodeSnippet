@@ -1,15 +1,15 @@
-﻿namespace RabbitMQConsumerClient2
+﻿namespace RabbitMQConsumerClient1
 {
     using System;
     using System.Text;
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
 
-    static class ExchangeTopicConsumerClient2
+    static class TopicConsumerClient1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine($"{nameof(ExchangeTopicConsumerClient2)}:");
+            Console.WriteLine($"{nameof(TopicConsumerClient1)}:");
             // RabbitMQ连接工厂
             var factory = new ConnectionFactory()
             {
@@ -37,7 +37,7 @@
                 exchange: exchangeName,
                 type: "topic");
 
-            string queueName = $"{exchangeName}_{nameof(ExchangeTopicConsumerClient2)}";
+            string queueName = $"{exchangeName}_{nameof(TopicConsumerClient1)}";
             // 声明队列
             channel.QueueDeclare(queue: queueName,
                 durable: false,

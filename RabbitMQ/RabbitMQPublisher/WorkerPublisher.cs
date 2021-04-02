@@ -6,9 +6,9 @@
     using RabbitMQ.Client;
 
     /// <summary>
-    /// Worker模式:信息以顺序的传输给每个接收者(fanout)
+    /// Worker模式:信息以顺序的传输给每个接收者
     /// </summary>
-    static class Worker
+    static class WorkerPublisher
     {
         static void Main(string[] args)
         {
@@ -43,7 +43,6 @@
                     // 消息发送
                     channel.BasicPublish(
                         exchange: "",
-                        // Worker模式下routingKey不写无法将消息发送到queue
                         routingKey: queueName,
                         basicProperties: null,
                         body: Encoding.UTF8.GetBytes(message));

@@ -5,11 +5,11 @@
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
 
-    static class ExchangeTopicConsumerClient1
+    static class FanoutConsumerClient1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine($"{nameof(ExchangeTopicConsumerClient1)}:");
+            Console.WriteLine($"{nameof(FanoutConsumerClient1)}:");
             // RabbitMQ连接工厂
             var factory = new ConnectionFactory()
             {
@@ -28,33 +28,32 @@
             // 创建信道
             using var channel = connection.CreateModel();
 
-            string exchangeName = $"testExchange_topic";
-
-            string routeKey = "testExchange_routeKey.*";
-
+            string exchangeName = $"test.rabbitMq.fanout";
             //声明交换机并指定类型
             channel.ExchangeDeclare(
                 exchange: exchangeName,
-                type: "topic");
+                type: "fanout");
 
-            string queueName = $"{exchangeName}_{nameof(ExchangeTopicConsumerClient1)}";
-            // 声明队列
+            string queueName = $"test.rabbitMq.fanout.queue";
+            //声明队列
             channel.QueueDeclare(queue: queueName,
                 durable: false,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
 
-            // 将队列与交换机进行绑定
-            channel.QueueBind(queue: queueName,
+            //将队列与交换机进行绑定
+            channel.QueueBind(
+                queue: queueName,
                 exchange: exchangeName,
-                routingKey: routeKey);
+                routingKey: "");
 
             EventingBasicConsumer consumer =
                 new EventingBasicConsumer(channel);
 
+            // 每次只能向消费者发送一条信息,在消费者未确认之前,不再向它发送信息
             channel.BasicQos(0, 1, false);
-
+            // 绑定消息接收后的事件委托
             consumer.Received += (model, ea) =>
             {
                 string message =
@@ -67,8 +66,9 @@
                     multiple: false);
             };
             channel.BasicConsume(queue: queueName,
-                  autoAck: false,
-                  consumer: consumer);
+                autoAck: false,
+                consumer: consumer);
+
             Console.ReadLine();
         }
     }
