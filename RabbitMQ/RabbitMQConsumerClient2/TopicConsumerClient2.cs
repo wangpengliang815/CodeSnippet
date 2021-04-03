@@ -11,26 +11,15 @@
         {
             Console.WriteLine($"{nameof(TopicConsumerClient2)}:");
             // RabbitMQ连接工厂
-            var factory = new ConnectionFactory()
-            {
-                HostName = "localhost",
-                // 用户名
-                UserName = "guest",
-                // 密码
-                Password = "guest",
-                // 网络故障自动恢复连接
-                AutomaticRecoveryEnabled = true,
-                // 心跳处理
-                RequestedHeartbeat = new TimeSpan(5000)
-            };
+            var factory = BaseConsumer.CreateRabbitMqConnection();
             // 建立连接
             using var connection = factory.CreateConnection();
             // 创建信道
             using var channel = connection.CreateModel();
 
-            string exchangeName = $"testExchange_topic";
+            string exchangeName = $"test.rabbitMq.topic";
 
-            string routeKey = "testExchange_routeKey.*";
+            string routeKey = "topic";
 
             //声明交换机并指定类型
             channel.ExchangeDeclare(

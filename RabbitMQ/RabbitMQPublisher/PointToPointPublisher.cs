@@ -1,4 +1,5 @@
-﻿namespace RabbitMQPublisher
+﻿#define publisher
+namespace RabbitMQPublisher
 {
     using System;
     using System.Text;
@@ -9,9 +10,11 @@
     /// <summary>
     /// 点对点:最简单的工作模式
     /// </summary>
-    static class PointToPointPublisher
+    internal static class PointToPointPublisher
     {
-        static void Main(string[] args)
+        readonly static string queueName = "test.pointToPoint.queue";
+#if publisher
+        private static void Main(string[] args)
         {
             while (true)
             {
@@ -20,27 +23,13 @@
                 if (!string.IsNullOrEmpty(message))
                 {
                     // RabbitMQ连接工厂
-                    var factory = new ConnectionFactory()
-                    {
-                        HostName = "localhost",
-                        // 用户名
-                        UserName = "guest",
-                        // 密码
-                        Password = "guest",
-                        // 网络故障自动恢复连接
-                        AutomaticRecoveryEnabled = true,
-                        // 心跳处理
-                        RequestedHeartbeat = new TimeSpan(5000)
-                    };
+                    ConnectionFactory factory = BasePublisher.CreateRabbitMqConnection();
                     // 建立连接
-                    using var connection = factory.CreateConnection();
+                    using IConnection connection = factory.CreateConnection();
                     // 创建信道
-                    using var channel = connection.CreateModel();
-
+                    using IModel channel = connection.CreateModel();
                     // 声明队列
-                    string queueName = "test.pointToPoint.queue";
                     channel.QueueDeclare(queueName, false, false, false, null);
-
                     // 消息发送
                     channel.BasicPublish(
                         exchange: "",
@@ -50,33 +39,17 @@
                 }
             }
         }
-    }
-
-    static class PointToPointConsumer
-    {
-        static void Main(string[] args)
+#else 
+        private static void Main(string[] args)
         {
-            Console.WriteLine($"{nameof(PointToPointConsumer)}:");
+            Console.WriteLine($"PointToPointConsumer");
             // RabbitMQ连接工厂
-            var factory = new ConnectionFactory()
-            {
-                HostName = "localhost",
-                // 用户名
-                UserName = "guest",
-                // 密码
-                Password = "guest",
-                // 网络故障自动恢复连接
-                AutomaticRecoveryEnabled = true,
-                // 心跳处理
-                RequestedHeartbeat = new TimeSpan(5000)
-            };
+            ConnectionFactory factory = BasePublisher.CreateRabbitMqConnection();
             // 建立连接
-            using var connection = factory.CreateConnection();
+            using IConnection connection = factory.CreateConnection();
             // 创建信道
-            using var channel = connection.CreateModel();
-
-            string queueName = "test.pointToPoint.queue";
-            // 申明队列
+            using IModel channel = connection.CreateModel();
+            // 声明队列
             channel.QueueDeclare(
                 queue: queueName,
                 durable: false,
@@ -104,8 +77,8 @@
             channel.BasicConsume(queue: queueName,
                 autoAck: false,
                 consumer: consumer);
-
             Console.ReadLine();
         }
+#endif
     }
 }

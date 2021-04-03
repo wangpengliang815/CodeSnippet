@@ -11,18 +11,7 @@
         {
             Console.WriteLine($"{nameof(TopicConsumerClient1)}:");
             // RabbitMQ连接工厂
-            var factory = new ConnectionFactory()
-            {
-                HostName = "localhost",
-                // 用户名
-                UserName = "guest",
-                // 密码
-                Password = "guest",
-                // 网络故障自动恢复连接
-                AutomaticRecoveryEnabled = true,
-                // 心跳处理
-                RequestedHeartbeat = new TimeSpan(5000)
-            };
+            var factory = BaseConsumer.CreateRabbitMqConnection();
             // 建立连接
             using var connection = factory.CreateConnection();
             // 创建信道

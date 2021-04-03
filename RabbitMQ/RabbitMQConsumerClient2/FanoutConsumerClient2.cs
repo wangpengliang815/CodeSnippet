@@ -12,30 +12,19 @@
         {
             Console.WriteLine($"{nameof(FanoutConsumerClient2)}:");
             // RabbitMQ连接工厂
-            var factory = new ConnectionFactory()
-            {
-                HostName = "localhost",
-                // 用户名
-                UserName = "guest",
-                // 密码
-                Password = "guest",
-                // 网络故障自动恢复连接
-                AutomaticRecoveryEnabled = true,
-                // 心跳处理
-                RequestedHeartbeat = new TimeSpan(5000)
-            };
+            var factory = BaseConsumer.CreateRabbitMqConnection();
             // 建立连接
             using var connection = factory.CreateConnection();
             // 创建信道
             using var channel = connection.CreateModel();
 
-            string exchangeName = $"testExchange_fanout";
+            string exchangeName = $"test.exchange.fanout";
             //声明交换机并指定类型
             channel.ExchangeDeclare(
                 exchange: exchangeName,
                 type: "fanout");
 
-            string queueName = $"{exchangeName}_{nameof(FanoutConsumerClient2)}";
+            string queueName = $"test.fanout.queue2";
             //声明队列
             channel.QueueDeclare(queue: queueName,
                 durable: false,
