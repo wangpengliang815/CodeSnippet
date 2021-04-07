@@ -19,11 +19,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Autofac\**" />
     <Compile Remove="Basics\**" />
-    <EmbeddedResource Remove="Autofac\**" />
     <EmbeddedResource Remove="Basics\**" />
-    <None Remove="Autofac\**" />
     <None Remove="Basics\**" />
   </ItemGroup>
 
