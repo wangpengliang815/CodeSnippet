@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GeneratingCiphertext.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "--cpath=\"C:\\Users\\WangPengLiang\\Desktop\\DataProtection\\certs\\dev.pfx\"  --cpass=\"wpl19950815\" --purpose=\"test\" --spath=\"C:\\\\Users\\\\WangPengLiang\\\\Desktop\\\\DataProtection\\\\app-keys\" --appname=\"test\" --snodes=\"Test1:helloworld\"  --soutputpath=\"C:\\Users\\WangPengLiang\\Desktop\\DataProtection\""
+    }
+  }
+}

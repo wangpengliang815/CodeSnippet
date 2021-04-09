@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFramework6.x.Console"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp01", "DataProtection\WebApp01\WebApp01.csproj", "{799565E2-1147-44E2-A027-F6FA72EC02A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneratingCiphertext.Console", "DataProtection\GeneratingCiphertext.Console\GeneratingCiphertext.Console.csproj", "{1B0FDC3D-3935-496D-982A-841E8B37C7DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{799565E2-1147-44E2-A027-F6FA72EC02A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{799565E2-1147-44E2-A027-F6FA72EC02A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{799565E2-1147-44E2-A027-F6FA72EC02A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B0FDC3D-3935-496D-982A-841E8B37C7DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B0FDC3D-3935-496D-982A-841E8B37C7DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B0FDC3D-3935-496D-982A-841E8B37C7DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B0FDC3D-3935-496D-982A-841E8B37C7DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{FFFBEBAB-697E-4A34-8A30-FD5AB31D5011} = {C4162CE2-01FF-37F4-C05B-5E3988AB145D}
 		{E2C4092A-337D-490B-834E-286253DCAD1A} = {99BA5433-DF5F-A898-C8E0-78B8BA55F251}
 		{799565E2-1147-44E2-A027-F6FA72EC02A8} = {485341EE-1A70-58C9-8586-222FDA911D63}
+		{1B0FDC3D-3935-496D-982A-841E8B37C7DF} = {485341EE-1A70-58C9-8586-222FDA911D63}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A3AEF608-81D4-4318-8D24-3C038E497705}
