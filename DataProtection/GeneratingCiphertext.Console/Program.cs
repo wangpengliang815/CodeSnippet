@@ -10,6 +10,8 @@
     /// <summary>依赖指定证书生成加密文件secret.xml以及对应{key}.xml文件</summary>
     static class Program
     {
+        /// <summary>Defines the entry point of the application.</summary>
+        /// <param name="args">The arguments.</param>
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<InputParameter>(args)
