@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-
-using Newtonsoft.Json;
-
-using WebApp01;
-
-namespace DataProtectionTests.Controllers
+﻿namespace WebApp01.Controllers
 {
+    using System.Collections.Generic;
+
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Options;
+
+    using Newtonsoft.Json;
+
+    using WebApp01.Options;
+
     [ApiController]
     [Route("[controller]")]
     public class EnvironmentController : ControllerBase

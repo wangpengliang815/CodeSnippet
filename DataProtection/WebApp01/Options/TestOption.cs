@@ -1,4 +1,4 @@
-﻿namespace WebApp01
+﻿namespace WebApp01.Options
 {
     using WebApp01.CustomDataProtection;
 

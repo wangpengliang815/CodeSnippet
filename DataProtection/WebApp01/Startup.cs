@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-using WebApp01;
-using WebApp01.CustomDataProtection;
-
-namespace DataProtectionTests
+namespace WebApp01
 {
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+
+    using WebApp01.CustomDataProtection;
+    using WebApp01.Options;
+
     public class Startup
     {
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
