@@ -31,7 +31,7 @@
                 // 设置应用程序名称
                 .SetApplicationName(protectionOption.ApplicationName)
                 // 设置秘钥存储路径
-                .PersistKeysToFileSystem(new DirectoryInfo(protectionOption.SecretKeyPath))
+                .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory() + "//" + protectionOption.SecretKeyPath))
                 // 设置用于加密的证书
                 .UnprotectKeysWithAnyCertificate(cert);
 
