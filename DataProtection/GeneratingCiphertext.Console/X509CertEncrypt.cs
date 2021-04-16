@@ -3,8 +3,6 @@
     using System.IO;
     using System.Security.Cryptography.X509Certificates;
 
-    using GeneratingCiphertext.Console;
-
     using Microsoft.AspNetCore.DataProtection;
     using Microsoft.Extensions.DependencyInjection;
 

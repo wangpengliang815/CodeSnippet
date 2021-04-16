@@ -2,11 +2,11 @@
 {
     using WebApp01.CustomDataProtection;
 
-    public class TestOption: ProtectionOptionBase
+    public class TestOption : ProtectionOptionBase
     {
-        [Encrypted]
         public string Test1 { get; set; }
 
+        [Encrypted]
         public string Test2 { get; set; }
     }
 }

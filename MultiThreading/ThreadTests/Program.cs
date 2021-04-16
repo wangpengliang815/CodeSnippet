@@ -284,7 +284,7 @@
             // 没有对异常进行处理
             static void ThreadMethodA()
             {
-                throw new Exception("AError");
+                throw new AggregateException("AError");
             }
 
             // 对异常进行处理
@@ -292,7 +292,7 @@
             {
                 try
                 {
-                    throw new Exception("BError");
+                    throw new AggregateException("BError");
                 }
                 catch (Exception ex)
                 {

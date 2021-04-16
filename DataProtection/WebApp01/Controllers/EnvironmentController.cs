@@ -35,6 +35,8 @@
             dicts.Add("ProtectionOption.Purpose", configuration.GetSection("ProtectionOption:Purpose").Value);
             dicts.Add("TestOption.Test1", testOption.Value.Test1);
             dicts.Add("TestOption.Test2", testOption.Value.Test2);
+            dicts.Add("DataBase.DbConnection", configuration.GetSection("DataBase:DbConnection").Value);
+
             return Ok(JsonConvert.SerializeObject(dicts));
         }
     }
