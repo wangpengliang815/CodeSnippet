@@ -38,7 +38,7 @@ namespace WebApp01
                 // 注入数据保护服务（依赖指定证书）
                 IDataProtector dataProtector = services.AddDataProtectionWithX509();
                 // 解密字符串
-                string connStr = dataProtector.Unprotect(Configuration.GetSection("Database:ConnectString").Value);
+                string connStr = dataProtector.Unprotect(Configuration.GetSection("Database:DbConnection").Value);
                 Console.WriteLine($"Sit:ConnStr:{connStr}");
                 // 解密Option;Option上带有EncryptedAttribute标记的属性将会被解密
                 services.ProtectedConfigure<TestOption>(Configuration.GetSection("TestOption"));
