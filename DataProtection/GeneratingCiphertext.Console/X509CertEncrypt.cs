@@ -32,7 +32,7 @@
                     options.SecretKeyPath))
                 .SetApplicationName(
                     options.ApplicationName)
-                   .ProtectKeysWithCertificate(
+                .ProtectKeysWithCertificate(
                     new X509Certificate2(options.CertFilePath, options.CertPassWord));
 
             IDataProtectionProvider dataProtectionProvider = service.BuildServiceProvider()
