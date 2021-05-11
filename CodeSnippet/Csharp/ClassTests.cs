@@ -62,9 +62,12 @@
 
         // 方法重载
         public void Print(string message) => Console.WriteLine(message);
+
         public void Print(string name, string messae) => Console.WriteLine($"name:{name},message:{messae}");
+        
         // 可选参数
         public void Print(string name, string message, string address, int age = 100) => Console.WriteLine($"{name},{message},{address},{age}");
+     
         // 个数可变的参数
         public void Print(string name, params string[] args)
         {
@@ -74,6 +77,7 @@
                 Console.WriteLine(item);
             }
         }
+       
         // out参数返回不同类型多个值
         public string Print(string name, out bool result)
         {

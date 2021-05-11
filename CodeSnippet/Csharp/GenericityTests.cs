@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     public class MyArray<T>
@@ -176,8 +177,7 @@
         [TestMethod]
         public void GenericityClass()
         {
-            MyArray<int> arr
-                = new MyArray<int>(5);
+            MyArray<int> arr = new MyArray<int>(5);
             for (int i = 0; i < 5; i++)
             {
                 arr.SetItem(i, i);
