@@ -39,7 +39,6 @@
         public void VariableTypeInference()
         {
             var name = "wang";
-
             Assert.AreEqual("wang", name);
         }
 
@@ -54,7 +53,6 @@
         {
             // 必须在声明常量时进行初始化,且之后不能再重新赋值
             const string name = "wang";
-
             Assert.AreEqual("wang", name);
         }
 
