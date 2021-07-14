@@ -7,7 +7,7 @@ namespace EntityFramework6.x.Console
     {
         public ApplicationContext() : base("Connection")
         {
-    
+        
         }
 
         public DbSet<Student> Students { get; set; }
