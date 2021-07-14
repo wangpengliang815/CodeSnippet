@@ -1,4 +1,4 @@
-﻿namespace CodeSnippet.Autofac.IOCTests
+﻿namespace codeSnippet.Autofac.IocTests
 {
     using System;
 
@@ -6,7 +6,7 @@
 
     [TestCategory("IOC")]
     [TestClass()]
-    public class IOCTests
+    public class IocTests
     {
         /// <summary>构造函数注入</summary>
         [TestMethod()]

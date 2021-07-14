@@ -1,4 +1,4 @@
-﻿//namespace CodeSnippet.EntityFramework6.x
+﻿//namespace codeSnippet.EntityFramework6.x
 //{
 //    using System;
 //    using System.Collections.Generic;

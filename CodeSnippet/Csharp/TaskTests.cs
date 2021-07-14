@@ -1,5 +1,5 @@
 ﻿#define debug
-namespace CodeSnippet.Csharp
+namespace codeSnippet.Csharp
 {
     using System;
     using System.Diagnostics;
@@ -7,6 +7,7 @@ namespace CodeSnippet.Csharp
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestCategory("Task")]
@@ -132,22 +133,47 @@ namespace CodeSnippet.Csharp
         /// 创建Task
         /// </summary>
         [TestMethod]
-        public void Task_Create_Example()
+        public void Task_Create_ExampleAsync()
         {
-            var t1 = new TaskFactory()
-                .StartNew(() => Console.WriteLine("new TaskFactory().StartNew"));
-            Assert.IsNotNull(t1);
+            //var t1 = new TaskFactory()
+            //    .StartNew(() => Console.WriteLine("new TaskFactory().StartNew"));
+            //Assert.IsNotNull(t1);
 
-            var t2 = Task.Factory
-                .StartNew(() => Console.WriteLine("Task.Factory"));
-            Assert.IsNotNull(t2);
+            //var t2 = Task.Factory
+            //    .StartNew(() => Console.WriteLine("Task.Factory"));
+            //Assert.IsNotNull(t2);
 
-            var t3 = new Task(() => Console.WriteLine("Task Constructor"));
-            t3.Start();
+            //var t3 = new Task(() => Console.WriteLine("Task Constructor"));
+            //t3.Start();
 
-            var t4 = Task.Run(() => Console.WriteLine("Task.Run"));
+            //var t4 = Task.Run(() => Console.WriteLine("Task.Run"));
 
-            Assert.IsNotNull(t4);
+            //Assert.IsNotNull(t4);
+
+
+            //Task.Run(Print);
+
+            Task.Run(async () =>
+            {
+                await PrintAsync();
+            });
+
+            //await PrintAsync();
+
+            Console.WriteLine("ok");
+        }
+
+        void Print()
+        {
+            Console.WriteLine($"Hello, 线程Id:{ Thread.CurrentThread.ManagedThreadId}");
+        }
+
+        async Task PrintAsync()
+        {
+            await Task.Run(() =>
+            {
+                Console.WriteLine($"Hello, 线程Id:{ Thread.CurrentThread.ManagedThreadId}");
+            });
         }
 
         /// <summary>
@@ -202,9 +228,9 @@ namespace CodeSnippet.Csharp
             static async void Print()
             {
                 await Task.Run(() =>
-               {
-                   Console.WriteLine($"Hello, 线程Id:{ Thread.CurrentThread.ManagedThreadId}");
-               });
+                {
+                    Console.WriteLine($"Hello, 线程Id:{ Thread.CurrentThread.ManagedThreadId}");
+                });
             }
         }
 
