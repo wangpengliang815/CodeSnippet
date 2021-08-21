@@ -1,4 +1,4 @@
-﻿namespace codeSnippet.Csharp
+﻿namespace CodeSnippet.Csharp
 {
     using System;
     using System.Buffers;
@@ -20,13 +20,16 @@
         public void ArrayDefinition()
         {
             int[] arr1 = new int[3];
+            Assert.AreEqual(0, arr1[0]);
+
             int[] arr2 = new int[3] { 1, 2, 3 };
+            Assert.AreEqual(1, arr2[0]);
+
             int[] arr3 = { 1, 2, 3 };
+            Assert.AreEqual(1, arr3[0]);
+
             int[] arr4;
             arr4 = new int[3] { 1, 2, 3 };
-            Assert.AreEqual(0, arr1[0]);
-            Assert.AreEqual(1, arr2[0]);
-            Assert.AreEqual(1, arr3[0]);
             Assert.AreEqual(1, arr4[0]);
 
             Person p1 = new Person { Name = "wang" };
@@ -94,7 +97,7 @@
                 Assert.AreEqual(i, arr.GetValue(i));
             }
 
-            // 显式将arr装换为数组
+            // 显式将arr转换为数组
             int[] arr2 = (int[])arr;
 
             for (int i = 0; i < arr2.Length; i++)
@@ -130,6 +133,7 @@
         [TestMethod]
         public void Enumerator()
         {
+            // TODO:枚举器的实现
             Assert.IsTrue(true);
         }
 
@@ -143,6 +147,7 @@
         [TestMethod]
         public void Iterator()
         {
+            // TODO:迭代器实现
             Assert.IsTrue(true);
         }
 

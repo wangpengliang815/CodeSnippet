@@ -1,4 +1,4 @@
-﻿namespace codeSnippet.Autofac.IocTests
+﻿namespace CodeSnippet.Autofac.IocTests
 {
     using System;
 

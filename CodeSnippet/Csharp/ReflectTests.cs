@@ -1,4 +1,4 @@
-﻿namespace codeSnippet.Csharp
+﻿namespace CodeSnippet.Csharp
 {
     using System;
     using System.Reflection;
@@ -136,10 +136,10 @@
         public void GetAssembly()
         {
             // 通过程序集名称返回Assembly对象
-            Assembly assembly = Assembly.Load("codeSnippet");
+            Assembly assembly = Assembly.Load("CodeSnippet");
 
             // 通过Assembly获取程序集中类(参数必须是类的全名)
-            Type type = assembly.GetType("codeSnippet.Csharp.ReflectClass");
+            Type type = assembly.GetType("CodeSnippet.Csharp.ReflectClass");
             Assert.IsNotNull(type);
 
             // 通过Assembly获取程序集中所有的类
@@ -148,11 +148,11 @@
 
             // 通过DLL文件名称返回Assembly对象
 #pragma warning disable S3885 // "Assembly.Load" should be used
-            Assembly assembly2 = Assembly.LoadFrom("codeSnippet.dll");
+            Assembly assembly2 = Assembly.LoadFrom("CodeSnippet.dll");
 #pragma warning restore S3885 // "Assembly.Load" should be used
 
             // 通过Assembly获取程序集中类(参数必须是类的全名)
-            Type type2 = assembly2.GetType("codeSnippet.Csharp.ReflectClass");
+            Type type2 = assembly2.GetType("CodeSnippet.Csharp.ReflectClass");
             Assert.IsNotNull(type2);
 
             // 通过Assembly获取程序集中所有的类
@@ -166,9 +166,9 @@
         [TestMethod]
         public void Example_02()
         {
-            Assembly assembly = Assembly.Load("codeSnippet");
+            Assembly assembly = Assembly.Load("CodeSnippet");
             //参数必须是类的全名
-            Type t = assembly.GetType("codeSnippet.Csharp.ReflectClass");
+            Type t = assembly.GetType("CodeSnippet.Csharp.ReflectClass");
             object o = Activator.CreateInstance(t, "男");
             MethodInfo mi = t.GetMethod("Show");
             mi.Invoke(o, null);
@@ -182,12 +182,12 @@
         public void Example_03()
         {
 #pragma warning disable S3885 // "Assembly.Load" should be used
-            Assembly assembly = Assembly.LoadFrom("codeSnippet.dll");
+            Assembly assembly = Assembly.LoadFrom("CodeSnippet.dll");
 #pragma warning restore S3885 // "Assembly.Load" should be used
             Type[] types = assembly.GetTypes();
             foreach (Type t in types)
             {
-                if (t.FullName == "codeSnippet.Csharp.ReflectClass")
+                if (t.FullName == "CodeSnippet.Csharp.ReflectClass")
                 {
                     object o = Activator.CreateInstance(t);
                     Assert.IsNotNull(o);

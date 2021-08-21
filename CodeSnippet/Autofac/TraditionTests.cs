@@ -1,4 +1,4 @@
-﻿namespace codeSnippet.Autofac.TraditionTests
+﻿namespace CodeSnippet.Autofac.TraditionTests
 {
     using System;
 

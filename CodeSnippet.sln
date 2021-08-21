@@ -13,12 +13,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataProtection", "DataProte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFramework6.x", "EntityFramework6.x", "{99BA5433-DF5F-A898-C8E0-78B8BA55F251}"
 	ProjectSection(SolutionItems) = preProject
-		codeSnippet\EntityFramework6.x\App.config = codeSnippet\EntityFramework6.x\App.config
+		CodeSnippet\EntityFramework6.x\App.config = CodeSnippet\EntityFramework6.x\App.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFrameworkCore", "EntityFrameworkCore", "{BA612241-D3C2-C60F-9564-85373587840E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "codeSnippet", "codeSnippet\codeSnippet.csproj", "{75A1E9CC-74DE-42DA-84DE-E8619C83A1EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeSnippet", "CodeSnippet\CodeSnippet.csproj", "{75A1E9CC-74DE-42DA-84DE-E8619C83A1EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQPublisher", "RabbitMQ\RabbitMQPublisher\RabbitMQPublisher.csproj", "{3753E0C9-5034-4142-A2EA-733A843A13CB}"
 EndProject

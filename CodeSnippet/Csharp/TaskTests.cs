@@ -1,5 +1,5 @@
 ﻿#define debug
-namespace codeSnippet.Csharp
+namespace CodeSnippet.Csharp
 {
     using System;
     using System.Diagnostics;

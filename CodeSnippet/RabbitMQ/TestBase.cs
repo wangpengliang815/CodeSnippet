@@ -1,4 +1,4 @@
-﻿namespace codeSnippet.RabbitMQ
+﻿namespace CodeSnippet.RabbitMQ
 {
     using System;
     using System.Text;

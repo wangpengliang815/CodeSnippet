@@ -1,5 +1,5 @@
 ﻿#define Example_03
-namespace codeSnippet.Csharp
+namespace CodeSnippet.Csharp
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

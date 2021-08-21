@@ -1,4 +1,4 @@
-﻿namespace codeSnippet.Redis
+﻿namespace CodeSnippet.Redis
 {
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
