@@ -1,6 +1,7 @@
 ﻿namespace CodeSnippet.Csharp
 {
     using System;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -36,6 +37,7 @@
     public abstract class AbstractBaseClass
     {
         public string BaseA { get; set; }
+
         public string BaseB { get; set; }
 
         public abstract void Print();
@@ -95,6 +97,7 @@
     public interface IPrint
     {
         void Print();
+
         void Print(string message);
     }
 
@@ -123,7 +126,7 @@
     ///    如果类包含抽象函数, 则该类也必须被声明为抽象的
     ///    抽象方法只在派生类中真正实现，这表明抽象方法只存放函数原型，不涉及主体代码
     ///    派生自抽象类的类需要实现其基类的抽象方法，才能实例化对象
-    ///    使用override关键子可在派生类中实现抽象方法，经override声明重写的方法称为重写基类方法，其签名必须与override方法的签名相同
+    ///    使用override关键字可在派生类中实现抽象方法，经override声明重写的方法称为重写基类方法，其签名必须与override方法的签名相同
     /// 抽象类和接口的区别
     ///    相同点：
     ///      1.都可以被继承
@@ -160,7 +163,7 @@
         [TestMethod]
         public void ImplementationInheritance()
         {
-            ChildrenA childrenA = new ChildrenA();
+            ChildrenA childrenA = new();
             childrenA.Print();
             childrenA.Print("test");
             childrenA.CallBasePrint("test");
@@ -173,7 +176,7 @@
         [TestMethod]
         public void Abstract()
         {
-            AbstractChildrenA abstractChildrenA = new AbstractChildrenA();
+            AbstractChildrenA abstractChildrenA = new();
             abstractChildrenA.Print();
             Assert.IsTrue(true);
         }
@@ -184,7 +187,7 @@
         [TestMethod]
         public void InterfaceInheritance()
         {
-            InterfaceChildrenA interfaceChildrenA = new InterfaceChildrenA();
+            InterfaceChildrenA interfaceChildrenA = new();
             interfaceChildrenA.Print();
             interfaceChildrenA.Print("test");
             Assert.IsTrue(true);

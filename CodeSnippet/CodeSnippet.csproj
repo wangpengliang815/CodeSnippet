@@ -35,6 +35,11 @@
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Faker.Net" Version="1.5.126" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.2.50" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CommonLib\CommonLib.csproj" />
   </ItemGroup>
 
 </Project>

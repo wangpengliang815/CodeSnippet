@@ -167,16 +167,16 @@
         [TestMethod]
         public void Delegate_Closure()
         {
-            List<Action> list = new List<Action>();
-            for (int i = 0; i < 5; i++)
-            {
-                Action t = () => Console.WriteLine(i.ToString());
-                list.Add(t);
-            }
-            foreach (Action t in list)
-            {
-                t();
-            }
+            //List<Action> list = new List<Action>();
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    Action t = () => Console.WriteLine(i.ToString());
+            //    list.Add(t);
+            //}
+            //foreach (Action t in list)
+            //{
+            //    t();
+            //}
 
             List<Action> list2 = new List<Action>();
             for (int i = 0; i < 5; i++)

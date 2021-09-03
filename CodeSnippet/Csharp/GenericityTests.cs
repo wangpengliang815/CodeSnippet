@@ -33,7 +33,7 @@
         public void PrintType<Tentity>()
             where Tentity : new()
         {
-            Tentity t = new Tentity();
+            Tentity t = new();
             Console.WriteLine(t.GetType());
         }
     }
