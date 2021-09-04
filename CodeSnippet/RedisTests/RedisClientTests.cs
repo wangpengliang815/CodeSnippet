@@ -1,9 +1,12 @@
-﻿namespace CodeSnippet.Redis
+﻿
+
+
+namespace CodeSnippet.Redis
 {
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using RedisHelp;
+    using CommonLib;
 
     using StackExchange.Redis;
 
@@ -375,21 +378,47 @@
         }
 
         [TestMethod]
-        public void Publish()
+        public void CreateTransaction()
         {
-            string channel = "Redis_Channel";
-            string message = "wangpengliang";
-            var result = redis.Publish(channel, message);
+            var tran = redis.CreateTransaction(0);
+            tran.StringSetAsync("name", "wangpengliang");
+            tran.StringSetAsync("name1", "wangkaining");
+            bool committed = tran.Execute();
+            Assert.IsTrue(committed);
         }
 
+        /// <summary>
+        /// Redis有三个最基本属性来保证分布式锁的有效实现
+        /// 安全性：互斥,在任何时候,只有一个客户端能持有锁
+        /// 活跃性：没有死锁.即使客户端在持有锁的时候崩溃,最后也会有其他客户端能获得锁,超时机制
+        /// 活跃性：故障容忍.只有大多数Redis节点时存活的,客户端仍可以获得锁和释放锁
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
-        public void Subscribe()
+        public void DistributedLockTest()
         {
-            string channel = "Redis_Channel";
-            redis.Subscribe(channel, (redisChannel, redisValue) =>
+            Parallel.For(0, 10, j =>
             {
-                Console.WriteLine(redisValue);
+                Parallel.Invoke(DistributedLock);
             });
+        }
+
+        private void DistributedLock()
+        {
+            string key = Guid.NewGuid().ToString();
+            RedisValue token = Environment.MachineName;
+            if (redis.db.LockTake(key, token, TimeSpan.FromMilliseconds(10)))
+            {
+                try
+                {
+                    redis.StringSet(Guid.NewGuid().ToString(), Thread.CurrentThread.ManagedThreadId);
+                    Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+                }
+                finally
+                {
+                    redis.db.LockRelease(key, token);
+                }
+            }
         }
 
         private class User

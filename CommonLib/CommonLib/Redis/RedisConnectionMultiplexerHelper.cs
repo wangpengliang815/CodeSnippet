@@ -1,4 +1,4 @@
-﻿namespace RedisHelp
+﻿namespace CommonLib
 {
     using StackExchange.Redis;
 

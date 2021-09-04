@@ -1,6 +1,6 @@
 ﻿namespace RedisPublisher
 {
-    using RedisHelp;
+    using CommonLib;
 
     using System;
 

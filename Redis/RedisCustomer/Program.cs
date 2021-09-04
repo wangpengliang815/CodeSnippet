@@ -1,6 +1,6 @@
 ﻿namespace RedisCustomer
 {
-    using RedisHelp;
+    using CommonLib;
 
     using System;
 

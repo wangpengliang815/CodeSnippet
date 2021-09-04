@@ -1,4 +1,4 @@
-﻿namespace RedisHelp
+﻿namespace CommonLib
 {
     using Newtonsoft.Json;
 
@@ -8,6 +8,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
     public class RedisHelper
     {
         /// <summary>
@@ -26,7 +27,7 @@
         /// <summary>
         /// Redis数据库对象
         /// </summary>
-        private readonly IDatabase db;
+        public readonly IDatabase db;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedisHelper"/> class.
@@ -495,6 +496,16 @@
         {
             ISubscriber sub = conn.GetSubscriber();
             sub.UnsubscribeAll();
+        }
+
+        /// <summary>
+        /// 创建一个Redis事务
+        /// </summary>
+        /// <param name="dbSerialNumber">The database serial number.</param>
+        /// <returns></returns>
+        public ITransaction CreateTransaction(int dbSerialNumber)
+        {
+            return conn.GetDatabase(dbSerialNumber).CreateTransaction();
         }
 
         public async Task<bool> StringSetAsync(string key, string value, TimeSpan? expiry = default)
