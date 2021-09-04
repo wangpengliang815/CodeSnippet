@@ -6,10 +6,16 @@
 
     public static class RedisConnectionMultiplexerHelper
     {
+        /// <summary>
+        /// Redis连接字符串
+        /// </summary>
         public static string RedisConnectionString { get; set; }
 
         private static readonly object locker = new();
 
+        /// <summary>
+        /// ConnectionMultiplexer对象
+        /// </summary>
         private static ConnectionMultiplexer connectionMultiplexerInstance;
 
         /// <summary>
@@ -57,7 +63,7 @@
         /// <param name="e"></param>
         private static void MuxerConfigurationChanged(object sender, EndPointEventArgs e)
         {
-            Console.WriteLine("Configuration changed: " + e.EndPoint);
+            Console.WriteLine($"Configuration changed: {e.EndPoint}");
         }
 
         /// <summary>
@@ -67,7 +73,7 @@
         /// <param name="e"></param>
         private static void MuxerErrorMessage(object sender, RedisErrorEventArgs e)
         {
-            Console.WriteLine("ErrorMessage: " + e.Message);
+            Console.WriteLine($"ErrorMessage:{e.Message}");
         }
 
         /// <summary>
@@ -77,7 +83,7 @@
         /// <param name="e"></param>
         private static void MuxerConnectionRestored(object sender, ConnectionFailedEventArgs e)
         {
-            Console.WriteLine("ConnectionRestored: " + e.EndPoint);
+            Console.WriteLine($"ConnectionRestored:{e.EndPoint}");
         }
 
         /// <summary>
@@ -87,7 +93,7 @@
         /// <param name="e"></param>
         private static void MuxerConnectionFailed(object sender, ConnectionFailedEventArgs e)
         {
-            Console.WriteLine("重新连接：Endpoint failed: " + e.EndPoint + ", " + e.FailureType + (e.Exception == null ? "" : (", " + e.Exception.Message)));
+            Console.WriteLine($"重新连接：Endpoint failed:{e.EndPoint},{e.FailureType},{e.Exception.Message}");
         }
 
         /// <summary>
@@ -97,7 +103,7 @@
         /// <param name="e"></param>
         private static void MuxerHashSlotMoved(object sender, HashSlotMovedEventArgs e)
         {
-            Console.WriteLine("HashSlotMoved:NewEndPoint" + e.NewEndPoint + ", OldEndPoint" + e.OldEndPoint);
+            Console.WriteLine($"HashSlotMoved:NewEndPoint={e.NewEndPoint},OldEndPoint={ e.OldEndPoint}");
         }
 
         /// <summary>
@@ -107,7 +113,7 @@
         /// <param name="e"></param>
         private static void MuxerInternalError(object sender, InternalErrorEventArgs e)
         {
-            Console.WriteLine("InternalError:Message" + e.Exception.Message);
+            Console.WriteLine($"InternalError:Message={e.Exception.Message}");
         }
     }
 }
