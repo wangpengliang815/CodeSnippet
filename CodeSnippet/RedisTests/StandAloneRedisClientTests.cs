@@ -1,12 +1,8 @@
-﻿
-
-
-namespace CodeSnippet.Redis
+﻿namespace CodeSnippet.Redis
 {
+    using CommonLib;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using CommonLib;
 
     using StackExchange.Redis;
 
@@ -15,9 +11,12 @@ namespace CodeSnippet.Redis
     using System.Threading;
     using System.Threading.Tasks;
 
-    [TestCategory("Redis")]
+    /// <summary>
+    /// 单机部署的Redis测试
+    /// </summary>
+    [TestCategory("RedisStanndAlone")]
     [TestClass()]
-    public class RedisClientTests
+    public class StandAloneRedisClientTests
     {
         private const string redisConnection = "192.168.31.143:6379";
         private readonly RedisHelper redis = new(0, redisConnection);
