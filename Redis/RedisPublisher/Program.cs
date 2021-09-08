@@ -10,7 +10,7 @@
 
         static void Main(string[] args)
         {
-            RedisHelper redis = new(0, redisConnection);
+            StackExchangeRedisHelper redis = new(0, redisConnection);
             string channel = "Redis_Channel";
 
             while (true)
