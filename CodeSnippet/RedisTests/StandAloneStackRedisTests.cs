@@ -9,50 +9,79 @@
 
     using System;
     using System.Collections.Generic;
-    using System.Runtime.InteropServices;
+    using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
-    /// 单机部署的Redis测试
+    /// 单机部署的Redis测试,使用StackExchange.Redis
     /// </summary>
-    [TestCategory("RedisStanndAlone")]
+    [TestCategory("StandAloneStackRedisTests")]
     [TestClass()]
-    public class StandAloneRedisClientTests
+    public class StandAloneStackRedisTests
     {
-        private static ServiceCollection serviceCollection;
-        private static IServiceProvider serviceProvider;
-        private const string redisConnection = "192.168.189.143:6379";
-        private static StackExchangeRedisHelper stackRedis;
-        //private readonly StackExchangeRedisHelper stackRedis = new(0, redisConnection);
+        private static TestContext _testContext;
 
-        [TestInitialize]
-        public void MethodInit()
+        private const string redisConnection = "192.168.31.143:6379";
+#if nonuseIoc
+        private readonly StackExchangeRedisHelper stackRedis = new(0, redisConnection);
+#endif
+
+        private static readonly IServiceCollection services = new ServiceCollection();
+        private static StackRedisHelper stackRedis;
+
+        private static readonly Stopwatch sw = new();
+
+        /// <summary>
+        /// Classes the initialize.
+        /// </summary>
+        /// <param name="testContext">The test context.</param>
+        [ClassInitialize]
+        public static void ClassInit(TestContext testContext)
         {
-            serviceCollection = new ServiceCollection();
-            serviceCollection.AddTransient(p => new StackExchangeRedisHelper(0, redisConnection));
-            serviceProvider = serviceCollection.BuildServiceProvider();
-            stackRedis = serviceProvider
-               .GetService<StackExchangeRedisHelper>();
-            GCHandle h = GCHandle.Alloc(stackRedis, GCHandleType.WeakTrackResurrection);
-            IntPtr addr = GCHandle.ToIntPtr(h);
-            Console.WriteLine("0x" + addr.ToString("X"));
+            _testContext = testContext;
+            services.AddSingleton(p => new StackRedisHelper(0, redisConnection));
+            IServiceProvider provider = services.BuildServiceProvider();
+            stackRedis = provider.GetService<StackRedisHelper>();
+        }
+
+        /// <summary>
+        /// Tests the case initialize.
+        /// </summary>
+        [TestInitialize]
+        public void TestCaseInit()
+        {
+            Console.WriteLine($"TestName: {_testContext.TestName}");
+            sw.Restart();
+            // 这里为了测试注入时的声明周期
+            Console.WriteLine($"{nameof(stackRedis)} HashCode: {stackRedis.GetHashCode()}");
+        }
+
+        /// <summary>
+        /// Tests the cleanup.
+        /// </summary>
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            sw.Stop();
+            Console.WriteLine($"time：{sw.ElapsedMilliseconds} Milliseconds");
         }
 
         [TestMethod]
         public void SetString()
         {
-            bool result = stackRedis.StringSet($"{Guid.NewGuid()}", $"{nameof(SetString)}");
+            bool result = stackRedis.StringSet($"{Guid.NewGuid()}", Faker.Name.FullName());
             Assert.IsTrue(result);
         }
 
         [TestMethod]
         public void SetStringList()
         {
+            Console.WriteLine(stackRedis.GetHashCode());
             List<KeyValuePair<RedisKey, RedisValue>> keyValues = new();
             for (int i = 0; i < 5; i++)
             {
-                keyValues.Add(new KeyValuePair<RedisKey, RedisValue>($"{Guid.NewGuid()}", nameof(SetStringList)));
+                keyValues.Add(new KeyValuePair<RedisKey, RedisValue>($"{Guid.NewGuid()}", Faker.Name.FullName()));
             }
             bool result = stackRedis.StringSet(keyValues);
             Assert.IsTrue(result);
@@ -156,7 +185,7 @@
         {
             string key = Guid.NewGuid().ToString();
             stackRedis.HashSet(key, "name", "wangpengliang");
-            var result = stackRedis.HashDelete(key, "name");
+            bool result = stackRedis.HashDelete(key, "name");
             Assert.IsTrue(result);
             Assert.IsFalse(stackRedis.HashExists(key, "name"));
         }
@@ -187,18 +216,18 @@
             stackRedis.HashSet(key, "name", "wangpengliang");
             stackRedis.HashSet(key, "age", "25");
 
-            var result = stackRedis.HashGet<string>(key, "name");
+            string result = stackRedis.HashGet<string>(key, "name");
             Assert.AreEqual("wangpengliang", result);
 
             key = Guid.NewGuid().ToString();
-            var person = new User
+            User person = new User
             {
                 Name = "wangpengliang",
                 Age = 25
             };
             stackRedis.HashSet(key, "user", person);
 
-            var result2 = stackRedis.HashGet<User>(key, "user");
+            User result2 = stackRedis.HashGet<User>(key, "user");
             Assert.AreEqual("wangpengliang", result2.Name);
         }
 
@@ -231,7 +260,7 @@
             stackRedis.HashSet(key, "name", "wangpengliang");
             stackRedis.HashSet(key, "age", "25");
 
-            var result = stackRedis.HashKeys<string>(key);
+            List<string> result = stackRedis.HashKeys<string>(key);
             Assert.IsTrue(result.Count == 2);
         }
 
@@ -246,10 +275,10 @@
             stackRedis.ListRightPush(key, "2");
             stackRedis.ListRightPush(key, "3");
 
-            var result1 = stackRedis.ListRightPop<string>(key);
+            string result1 = stackRedis.ListRightPop<string>(key);
             Assert.AreEqual("3", result1);
 
-            var result2 = stackRedis.ListLeftPop<string>(key);
+            string result2 = stackRedis.ListLeftPop<string>(key);
             Assert.AreEqual("1", result2);
         }
 
@@ -261,10 +290,10 @@
             stackRedis.ListLeftPush(key, "2");
             stackRedis.ListLeftPush(key, "1");
 
-            var result1 = stackRedis.ListRightPop<string>(key);
+            string result1 = stackRedis.ListRightPop<string>(key);
             Assert.AreEqual("3", result1);
 
-            var result2 = stackRedis.ListLeftPop<string>(key);
+            string result2 = stackRedis.ListLeftPop<string>(key);
             Assert.AreEqual("1", result2);
         }
 
@@ -276,7 +305,7 @@
             stackRedis.ListLeftPush(key, "2");
             stackRedis.ListLeftPush(key, "1");
 
-            var result = stackRedis.ListLength(key);
+            long result = stackRedis.ListLength(key);
             Assert.AreEqual(3, result);
 
             stackRedis.ListLeftPop<string>(key);
@@ -293,7 +322,7 @@
             stackRedis.SortedSetAdd(key, "zhou", 12);
             stackRedis.SortedSetAdd(key, "zhang", 4);
 
-            var result = stackRedis.SortedSetLength(key);
+            long result = stackRedis.SortedSetLength(key);
             Assert.AreEqual(4, result);
         }
 
@@ -308,7 +337,7 @@
 
             stackRedis.SortedSetRemove(key, "zhou");
 
-            var result = stackRedis.SortedSetLength(key);
+            long result = stackRedis.SortedSetLength(key);
             Assert.AreEqual(3, result);
         }
 
@@ -320,7 +349,7 @@
             stackRedis.SortedSetAdd(key, "li", 11);
             stackRedis.SortedSetAdd(key, "zhou", 12);
             stackRedis.SortedSetAdd(key, "zhang", 4);
-            var result = stackRedis.SortedSetRangeByRank<string>(key, 0, 2);
+            List<string> result = stackRedis.SortedSetRangeByRank<string>(key, 0, 2);
             Assert.AreEqual(3, result.Count);
         }
 
@@ -331,7 +360,7 @@
             stackRedis.StringSet(key, $"{nameof(KeyDelete)}");
 
             stackRedis.KeyDelete(key);
-            var result = stackRedis.StringGet(key);
+            string result = stackRedis.StringGet(key);
             Assert.IsNull(result);
         }
 
@@ -344,8 +373,8 @@
             stackRedis.StringSet(key2, $"{nameof(KeyDeleteList)}");
 
             stackRedis.KeyDelete(new List<string> { key1, key2 });
-            var result = stackRedis.StringGet(new List<string> { key1, key2 });
-            foreach (var item in result)
+            RedisValue[] result = stackRedis.StringGet(new List<string> { key1, key2 });
+            foreach (RedisValue item in result)
             {
                 Assert.IsTrue(item.IsNull);
             }
@@ -371,7 +400,7 @@
             stackRedis.StringSet(key, value);
             string newKey = Guid.NewGuid().ToString();
             stackRedis.KeyRename(key, newKey);
-            var result = stackRedis.StringGet(newKey);
+            string result = stackRedis.StringGet(newKey);
 
             Assert.AreEqual("wangpengliang", result);
         }
@@ -385,7 +414,7 @@
             stackRedis.StringGet(key);
 
             stackRedis.KeyExpire(key, TimeSpan.FromSeconds(3));
-            var result = stackRedis.StringGet(key);
+            string result = stackRedis.StringGet(key);
             Assert.AreEqual("wangpengliang", result);
 
             Thread.Sleep(3000);
@@ -394,12 +423,23 @@
             Assert.AreEqual(null, result);
         }
 
+        /// <summary>
+        /// 关于事务的处理
+        /// StackExchange.Redis：命令不会抛出异常,所有正常的命令都会被执行
+        /// </summary>
         [TestMethod]
         public void CreateTransaction()
         {
-            var tran = stackRedis.CreateTransaction(0);
-            tran.StringSetAsync("name", "wangpengliang");
-            tran.StringSetAsync("name1", "wangkaining");
+            ITransaction tran = stackRedis.CreateTransaction(0);
+            string strKey = Guid.NewGuid().ToString();
+            string Strval = Faker.Name.FullName();
+            tran.StringSetAsync(strKey, Strval);
+            tran.StringIncrementAsync($"{strKey}", 5);
+
+            string intKey = Guid.NewGuid().ToString();
+            int intVal = Faker.RandomNumber.Next(1, 10);
+            tran.StringSetAsync(intKey, intVal);
+
             bool committed = tran.Execute();
             Assert.IsTrue(committed);
         }

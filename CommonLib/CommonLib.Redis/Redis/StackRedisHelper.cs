@@ -10,9 +10,10 @@
     using System.Threading.Tasks;
 
     /// <summary>
-    /// 基于StackExchange.Redis封装的Helper,使用单例模式
+    /// 基于StackExchange.Redis封装
+    /// 
     /// </summary>
-    public class StackExchangeRedisHelper
+    public class StackRedisHelper
     {
         /// <summary>
         /// 自定义缓存Key前缀
@@ -33,16 +34,21 @@
         public readonly IDatabase db;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StackExchangeRedisHelper"/> class.
+        /// Initializes a new instance of the <see cref="StackRedisHelper"/> class.
         /// </summary>
         /// <param name="dbSerialNumber">The database serial number.</param>
         /// <param name="redisConnectionString">The redis connection string.</param>
         /// <param name="customKeyPrefix">The custom key prefix.</param>
-        public StackExchangeRedisHelper(int dbSerialNumber, string redisConnectionString, string customKeyPrefix = null)
+        public StackRedisHelper(int dbSerialNumber
+            , string redisConnectionString
+            , string customKeyPrefix = null)
         {
+            CustomKeyPrefix = customKeyPrefix;
+#if customSingleton 
             RedisConnectionMultiplexerHelper.RedisConnectionString = redisConnectionString;
             conn = RedisConnectionMultiplexerHelper.Instance;
-            CustomKeyPrefix = customKeyPrefix;
+#endif
+            conn = ConnectionMultiplexer.Connect(redisConnectionString);
             db = conn.GetDatabase(dbSerialNumber);
         }
 
@@ -815,6 +821,9 @@
         }
     }
 
+    /// <summary>
+    /// 单例获取RedisConnectionMultiplexer
+    /// </summary>
     static class RedisConnectionMultiplexerHelper
     {
         /// <summary>
