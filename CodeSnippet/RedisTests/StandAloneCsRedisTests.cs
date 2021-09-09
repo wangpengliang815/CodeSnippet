@@ -13,7 +13,7 @@ namespace CodeSnippet.Redis
 
     using System;
     using System.Diagnostics;
-    using System.Linq;
+    using System.Threading;
 
     /// <summary>
     /// 单机部署的Redis测试,使用CSRedis
@@ -24,7 +24,7 @@ namespace CodeSnippet.Redis
     {
         private static TestContext _testContext;
 
-        private const string redisConnection = "192.168.55.143:6379";
+        private const string redisConnection = "192.168.48.143:6379";
 
         private static readonly IServiceCollection services = new ServiceCollection();
         private static CSRedisClient csRedis;
@@ -83,7 +83,7 @@ namespace CodeSnippet.Redis
         }
 
         /// <summary>
-        /// 关于事务的处理
+        /// 事务处理
         /// </summary>
         [TestMethod]
         public void Transaction()
@@ -131,6 +131,87 @@ namespace CodeSnippet.Redis
             tran.IncrBy(strKey, 5);
             var b = tran.EndPipe();
 #endif
+        }
+
+        [TestMethod]
+        public void KeyExpire()
+        {
+            string key = "name";
+            string value = "wangpengliang";
+            csRedis.Set(key, value);
+
+            csRedis.Expire(key, 3);
+            string result = csRedis.Get(key);
+            Assert.AreEqual(value, result);
+            Thread.Sleep(4000);
+            result = csRedis.Get(key);
+            Assert.AreEqual(null, result);
+        }
+
+        /// <summary>
+        /// 缓存壳
+        /// </summary>
+        [TestMethod]
+        public void CacheShell()
+        {
+            string value = "wangpengliang";
+
+#if debug
+            // 一般的缓存代码，如不封装比较繁琐
+            var cacheValue = csRedis.Get("name");
+            // 如果已被缓存
+            if (!string.IsNullOrEmpty(cacheValue))
+            {
+                try
+                {
+                    // 
+                }
+                catch
+                {
+                    //出错时删除key
+                    csRedis.Del("name");
+                    throw;
+                }
+            }
+            else
+            {
+                csRedis.Set("name", value, 10);
+            }
+#endif
+            // 判断key=name是否已存在,存在返回value,不存在设置
+            string t1 = csRedis.CacheShell("name", 10, () => value);
+            Assert.AreEqual(value, t1);
+            string t2 = csRedis.CacheShell("name", 10, () => "wangpengliang2");
+            Assert.AreEqual(value, t2);
+            string t3 = csRedis.CacheShell("name2", 10, () => "wangpengliang2");
+            Assert.AreEqual("wangpengliang2", t3);
+        }
+
+        /// <summary>
+        /// 多数据库,使用多个CSRedisClient实现
+        /// </summary>
+        [TestMethod]
+        public void MultiDatabase()
+        {
+            // 实际使用必须要单例
+            CSRedisClient[] redis = new CSRedisClient[14];
+            for (int i = 0; i < redis.Length; i++)
+            {
+                redis[i] = new CSRedisClient($"{redisConnection},defaultDatabase={i}");
+            }
+
+            redis[0].Set("db0", "db0");
+            string t1 = redis[0].Get("db0");
+            Assert.AreEqual("db0", t1);
+
+
+            redis[1].Set("db1", "db1");
+            string t2 = redis[1].Get("db1");
+            Assert.AreEqual("db1", t2);
+
+            redis[2].Set("db2", "db2");
+            string t3 = redis[2].Get("db2");
+            Assert.AreEqual("db2", t3);
         }
     }
 }
