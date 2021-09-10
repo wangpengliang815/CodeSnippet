@@ -2,6 +2,9 @@
 {
     using System;
     using System.Text;
+
+    using EasyNetQ;
+
     using RabbitMQ.Client;
 
     /// <summary>
@@ -12,6 +15,7 @@
     {
         static void Main(string[] args)
         {
+#if debug
             while (true)
             {
                 Console.WriteLine("消息发布者:模式{fanout}=>输入消息内容");
@@ -51,6 +55,18 @@
                         routingKey: "",
                         basicProperties: null,
                         body: Encoding.UTF8.GetBytes(message));
+                }
+            }
+#endif
+            var connStr = "host=192.168.252.191;username=guest;password=guest";
+
+            using (var bus = RabbitHutch.CreateBus(connStr))
+            {
+                var input = "";
+                Console.WriteLine("Please enter a message. 'Quit' to quit.");
+                while ((input = Console.ReadLine()) != "Quit")
+                {
+                    bus.PubSub.Publish(input);
                 }
             }
         }

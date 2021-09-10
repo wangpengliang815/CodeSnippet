@@ -3,53 +3,97 @@ namespace CodeSnippet.RabbitMQ
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
+
+    using CommonLib.RabbitMQ;
+
     using global::RabbitMQ.Client;
+
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestCategory("RabbitMQ")]
     [TestClass()]
     public class PublisherTests : TestBase
     {
+        private static TestContext _testContext;
+        private const string redisConnection = @"host=192.168.252.191;virtualHost=myVirtualHost;username=guest;password=guest";
+        private static readonly IServiceCollection services = new ServiceCollection();
+        private static RabbitMQHelper mq;
+
+        private static readonly Stopwatch sw = new();
+
+        /// <summary>
+        /// Classes the initialize.
+        /// </summary>
+        /// <param name="testContext">The test context.</param>
+        [ClassInitialize]
+        public static void ClassInit(TestContext testContext)
+        {
+            _testContext = testContext;
+            services.AddSingleton(p => new RabbitMQHelper(redisConnection));
+            IServiceProvider provider = services.BuildServiceProvider();
+            mq = provider.GetService<RabbitMQHelper>();
+        }
+
+        /// <summary>
+        /// Tests the case initialize.
+        /// </summary>
+        [TestInitialize]
+        public void TestCaseInit()
+        {
+            Console.WriteLine($"TestName: {_testContext.TestName}");
+            sw.Restart();
+            // 这里为了测试注入时的声明周期
+            Console.WriteLine($"{nameof(mq)} HashCode: {mq.GetHashCode()}");
+        }
+
+        /// <summary>
+        /// Tests the cleanup.
+        /// </summary>
         [TestCleanup]
         public void TestCleanup()
         {
-            channel.Dispose();
-            connection.Dispose();
+            sw.Stop();
+            mq.Dispose();
+            Console.WriteLine($"time：{sw.ElapsedMilliseconds} Milliseconds");
         }
 
-#if RabbitMQRuning
+
         /// <summary>
         /// 生产端
         /// </summary>
         [TestMethod]
         public void PublisherTest_Basic()
         {
-            // 创建名称为hello的队列
-            channel.QueueDeclare(
-                queue: "hello",
-                durable: false,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
+            mq.PublishAsync("easynet").ConfigureAwait(false);
 
-            string message = "hello world";
-            byte[] messageBody = Encoding.UTF8.GetBytes(message);
-            try
-            {
-                // 消息发送
-                channel.BasicPublish(
-                    exchange: "",
-                    routingKey: "hello",
-                    basicProperties: null,
-                    body: messageBody);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail(ex.Message);
-            }
+            //// 创建名称为hello的队列
+            //channel.QueueDeclare(
+            //    queue: "hello",
+            //    durable: false,
+            //    exclusive: false,
+            //    autoDelete: false,
+            //    arguments: null);
+
+            //string message = "hello world";
+            //byte[] messageBody = Encoding.UTF8.GetBytes(message);
+            //try
+            //{
+            //    // 消息发送
+            //    channel.BasicPublish(
+            //        exchange: "",
+            //        routingKey: "hello",
+            //        basicProperties: null,
+            //        body: messageBody);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Assert.Fail(ex.Message);
+            //}
         }
-
+#if debug
         /// <summary>
         /// 生产端消息确认(tx事务机制)
         /// </summary>
@@ -208,6 +252,7 @@ namespace CodeSnippet.RabbitMQ
             }
             Assert.IsTrue(true);
         }
-    }
 #endif
+    }
 }
+

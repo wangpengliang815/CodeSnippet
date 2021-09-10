@@ -2,6 +2,9 @@
 {
     using System;
     using System.Text;
+
+    using EasyNetQ;
+
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
 
@@ -9,6 +12,7 @@
     {
         static void Main(string[] args)
         {
+#if debug
             Console.WriteLine($"{nameof(FanoutConsumerClient1)}:");
             // RabbitMQ连接工厂
             var factory = BaseConsumer.CreateRabbitMqConnection();
@@ -60,5 +64,18 @@
 
             Console.ReadLine();
         }
+#endif
+            var connStr = "host=192.168.252.191;username=guest;password=guest";
+
+            using (var bus = RabbitHutch.CreateBus(connStr))
+            {
+                bus.PubSub.Subscribe<string>("easynet", (message) =>
+                {
+                    Console.WriteLine(message);
+                });
+                Console.ReadLine();
+            }
+        }
+
     }
 }

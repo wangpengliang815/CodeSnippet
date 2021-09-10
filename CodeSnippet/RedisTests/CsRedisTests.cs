@@ -16,11 +16,11 @@ namespace CodeSnippet.Redis
     using System.Threading;
 
     /// <summary>
-    /// 单机部署的Redis测试,使用CSRedis
+    /// 使用CSRedis
     /// </summary>
     [TestCategory("StandAloneCsRedisTests")]
     [TestClass()]
-    public class StandAloneCsRedisTests
+    public class CsRedisTests
     {
         private static TestContext _testContext;
 
@@ -133,6 +133,9 @@ namespace CodeSnippet.Redis
 #endif
         }
 
+        /// <summary>
+        /// Key过期
+        /// </summary>
         [TestMethod]
         public void KeyExpire()
         {

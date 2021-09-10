@@ -18,7 +18,7 @@
     /// </summary>
     [TestCategory("StandAloneStackRedisTests")]
     [TestClass()]
-    public class StandAloneStackRedisTests
+    public class StackRedisTests
     {
         private static TestContext _testContext;
 

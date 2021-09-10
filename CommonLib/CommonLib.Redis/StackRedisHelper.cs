@@ -37,18 +37,21 @@
         /// Initializes a new instance of the <see cref="StackRedisHelper"/> class.
         /// </summary>
         /// <param name="dbSerialNumber">The database serial number.</param>
-        /// <param name="redisConnectionString">The redis connection string.</param>
+        /// <param name="connectionString">The redis connection string.</param>
         /// <param name="customKeyPrefix">The custom key prefix.</param>
         public StackRedisHelper(int dbSerialNumber
-            , string redisConnectionString
+            , string connectionString
             , string customKeyPrefix = null)
         {
             CustomKeyPrefix = customKeyPrefix;
-#if customSingleton 
+#if customSingleton
             RedisConnectionMultiplexerHelper.RedisConnectionString = redisConnectionString;
             conn = RedisConnectionMultiplexerHelper.Instance;
 #endif
-            conn = ConnectionMultiplexer.Connect(redisConnectionString);
+            if (string.IsNullOrEmpty(connectionString))
+                throw new ArgumentNullException(nameof(connectionString));
+
+            conn = ConnectionMultiplexer.Connect(connectionString);
             db = conn.GetDatabase(dbSerialNumber);
         }
 

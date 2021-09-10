@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CommonLib\CommonLib.RabbitMQ\CommonLib.RabbitMQ.csproj" />
     <ProjectReference Include="..\CommonLib\CommonLib.Redis\CommonLib.Redis.csproj" />
   </ItemGroup>
 
