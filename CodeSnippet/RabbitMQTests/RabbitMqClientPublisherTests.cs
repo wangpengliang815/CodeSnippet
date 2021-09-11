@@ -1,5 +1,5 @@
 ﻿#define RabbitMQRuning
-namespace CodeSnippet.RabbitMQ
+namespace CodeSnippet.RabbitMQTests
 {
     using System;
     using System.Collections.Generic;
@@ -13,40 +13,29 @@ namespace CodeSnippet.RabbitMQ
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    [TestCategory("RabbitMQ")]
+    /// <summary>
+    /// 使用RabbitMQClient
+    /// </summary>
+    /// <seealso cref="CodeSnippet.RabbitMQ.TestBase" />
+    [TestCategory("RebbitMQ-Client")]
     [TestClass()]
-    public class PublisherTests : TestBase
+    public class RabbitMqClientPublisherTests : TestBase
     {
         private static TestContext _testContext;
-        private const string redisConnection = @"host=192.168.252.191;virtualHost=myVirtualHost;username=guest;password=guest";
-        private static readonly IServiceCollection services = new ServiceCollection();
-        private static RabbitMQHelper mq;
 
         private static readonly Stopwatch sw = new();
 
-        /// <summary>
-        /// Classes the initialize.
-        /// </summary>
-        /// <param name="testContext">The test context.</param>
         [ClassInitialize]
         public static void ClassInit(TestContext testContext)
         {
             _testContext = testContext;
-            services.AddSingleton(p => new RabbitMQHelper(redisConnection));
-            IServiceProvider provider = services.BuildServiceProvider();
-            mq = provider.GetService<RabbitMQHelper>();
         }
 
-        /// <summary>
-        /// Tests the case initialize.
-        /// </summary>
         [TestInitialize]
         public void TestCaseInit()
         {
             Console.WriteLine($"TestName: {_testContext.TestName}");
             sw.Restart();
-            // 这里为了测试注入时的声明周期
-            Console.WriteLine($"{nameof(mq)} HashCode: {mq.GetHashCode()}");
         }
 
         /// <summary>
@@ -56,44 +45,38 @@ namespace CodeSnippet.RabbitMQ
         public void TestCleanup()
         {
             sw.Stop();
-            mq.Dispose();
+            channel.Dispose();
+            connection.Dispose();
             Console.WriteLine($"time：{sw.ElapsedMilliseconds} Milliseconds");
         }
 
-
         /// <summary>
-        /// 生产端
+        /// 向queue中发布一条消息,如果queue不存在则会创建
         /// </summary>
         [TestMethod]
         public void PublisherTest_Basic()
         {
-            mq.PublishAsync("easynet").ConfigureAwait(false);
+            // 创建名称为hello的队列
+            //channel.QueueDeclare(queue: "hello", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
-            //// 创建名称为hello的队列
-            //channel.QueueDeclare(
-            //    queue: "hello",
-            //    durable: false,
-            //    exclusive: false,
-            //    autoDelete: false,
-            //    arguments: null);
+            string message = "hello world";
+            byte[] messageBody = Encoding.UTF8.GetBytes(message);
+            try
+            {
+                // 消息发送,mandatory=如果发布了一个设置了“强制”标志的消息，但未能送达，则代理将消息返回给发送的客户端（通过basic.return AMQP 0-9-1命令）。 要获得此类通知，客户端可以订阅IModel.BasicReturn事件。 如果没有附加事件的监听器，则返回的消息将被静默地丢弃。
+                channel.BasicPublish(exchange: "", routingKey: "hello", basicProperties: null, body: messageBody, mandatory: true);
 
-            //string message = "hello world";
-            //byte[] messageBody = Encoding.UTF8.GetBytes(message);
-            //try
-            //{
-            //    // 消息发送
-            //    channel.BasicPublish(
-            //        exchange: "",
-            //        routingKey: "hello",
-            //        basicProperties: null,
-            //        body: messageBody);
-            //}
-            //catch (Exception ex)
-            //{
-            //    Assert.Fail(ex.Message);
-            //}
+                channel.BasicReturn += (sender, message) =>
+                {
+                    Console.WriteLine(Encoding.UTF8.GetString(message.Body.ToArray()));
+                };
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
         }
-#if debug
+
         /// <summary>
         /// 生产端消息确认(tx事务机制)
         /// </summary>
@@ -252,7 +235,6 @@ namespace CodeSnippet.RabbitMQ
             }
             Assert.IsTrue(true);
         }
-#endif
     }
 }
 

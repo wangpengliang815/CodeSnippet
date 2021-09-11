@@ -2,6 +2,7 @@
 {
     using System;
     using System.Text;
+
     using RabbitMQ.Client;
 
     /// <summary>
@@ -23,9 +24,7 @@
                     using var channel = connection.CreateModel();
                     // 声明交换机
                     string exchangeName = $"test.exchange.direct";
-                    channel.ExchangeDeclare(
-                        exchange: exchangeName,
-                        type: "direct");
+                    channel.ExchangeDeclare(exchange: exchangeName, type: "direct");
 
                     // 声明队列
                     string queue1 = "test.direct.queue1";
@@ -35,22 +34,12 @@
                     channel.QueueDeclare(queue2, false, false, false, null);
 
                     //将队列与交换机进行绑定
-                    channel.QueueBind(
-                        queue: queue1,
-                        exchange: exchangeName,
-                        routingKey: "fanout");
+                    channel.QueueBind(queue: queue1, exchange: exchangeName, routingKey: "fanout");
 
-                    channel.QueueBind(
-                      queue: queue2,
-                      exchange: exchangeName,
-                      routingKey: "");
+                    channel.QueueBind(queue: queue2, exchange: exchangeName, routingKey: "");
 
                     // 只有queue1可以收到消息,因为queue2的routingKey不匹配
-                    channel.BasicPublish(
-                        exchange: exchangeName,
-                        routingKey: "fanout",
-                        basicProperties: null,
-                        body: Encoding.UTF8.GetBytes(message));
+                    channel.BasicPublish(exchange: exchangeName, routingKey: "fanout", basicProperties: null, body: Encoding.UTF8.GetBytes(message));
                 }
             }
         }

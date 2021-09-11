@@ -14,9 +14,9 @@
     using System.Threading.Tasks;
 
     /// <summary>
-    /// 单机部署的Redis测试,使用StackExchange.Redis
+    /// 使用StackExchange.Redis
     /// </summary>
-    [TestCategory("StandAloneStackRedisTests")]
+    [TestCategory("StackRedisTests")]
     [TestClass()]
     public class StackRedisTests
     {
@@ -29,7 +29,6 @@
 
         private static readonly IServiceCollection services = new ServiceCollection();
         private static StackRedisHelper stackRedis;
-
         private static readonly Stopwatch sw = new();
 
         /// <summary>
@@ -53,7 +52,6 @@
         {
             Console.WriteLine($"TestName: {_testContext.TestName}");
             sw.Restart();
-            // 这里为了测试注入时的声明周期
             Console.WriteLine($"{nameof(stackRedis)} HashCode: {stackRedis.GetHashCode()}");
         }
 
@@ -67,6 +65,9 @@
             Console.WriteLine($"time：{sw.ElapsedMilliseconds} Milliseconds");
         }
 
+        /// <summary>
+        /// 保存单个k/v
+        /// </summary>
         [TestMethod]
         public void SetString()
         {
@@ -74,10 +75,12 @@
             Assert.IsTrue(result);
         }
 
+        /// <summary>
+        /// 保存多个k/v
+        /// </summary>
         [TestMethod]
         public void SetStringList()
         {
-            Console.WriteLine(stackRedis.GetHashCode());
             List<KeyValuePair<RedisKey, RedisValue>> keyValues = new();
             for (int i = 0; i < 5; i++)
             {
@@ -87,6 +90,9 @@
             Assert.IsTrue(result);
         }
 
+        /// <summary>
+        /// 保存Object
+        /// </summary>
         [TestMethod]
         public void SetObject()
         {
@@ -105,6 +111,9 @@
             Assert.IsTrue(result2);
         }
 
+        /// <summary>
+        /// 获取单个k/v
+        /// </summary>
         [TestMethod]
         public void GetString()
         {
@@ -115,6 +124,9 @@
             Assert.AreEqual(value, result);
         }
 
+        /// <summary>
+        /// 获取多个k/v
+        /// </summary>
         [TestMethod]
         public void GetStringList()
         {
@@ -143,6 +155,9 @@
             }
         }
 
+        /// <summary>
+        /// 指定增长
+        /// </summary>
         [TestMethod]
         public void StringIncrement()
         {
@@ -153,6 +168,9 @@
             Assert.AreEqual(11, result);
         }
 
+        /// <summary>
+        /// 指定减少
+        /// </summary>
         [TestMethod]
         public void StringDecrement()
         {
@@ -264,9 +282,6 @@
             Assert.IsTrue(result.Count == 2);
         }
 
-        /// <summary>
-        /// Queue
-        /// </summary>
         [TestMethod]
         public void ListQueue()
         {
@@ -379,7 +394,6 @@
                 Assert.IsTrue(item.IsNull);
             }
         }
-
 
         [TestMethod]
         public void KeyExists()

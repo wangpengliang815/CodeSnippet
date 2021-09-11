@@ -11,7 +11,7 @@
             // RabbitMQ连接工厂
             return new ConnectionFactory()
             {
-                HostName = "localhost",
+                HostName = "192.168.31.191",
                 // 用户名
                 UserName = "guest",
                 // 密码

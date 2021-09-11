@@ -32,8 +32,7 @@
             IServiceProvider provider = services.BuildServiceProvider();
             CSRedisClient redis = provider.GetService<CSRedisClient>();
 
-            redis.Subscribe(
-                 (channel, msg => Console.WriteLine(msg.Body)));
+            redis.Subscribe((channel, msg => Console.WriteLine(msg.Body)));
             Console.ReadLine();
         }
     }

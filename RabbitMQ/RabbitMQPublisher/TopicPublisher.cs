@@ -2,6 +2,7 @@
 {
     using System;
     using System.Text;
+
     using RabbitMQ.Client;
 
     /// <summary>
@@ -26,9 +27,7 @@
 
                     // 声明交换机
                     string exchangeName = $"test.exchange.topic";
-                    channel.ExchangeDeclare(
-                        exchange: exchangeName,
-                        type: "topic");
+                    channel.ExchangeDeclare(exchange: exchangeName, type: "topic");
 
                     // 声明队列
                     string queue1 = "test.topic.queue1";
@@ -38,15 +37,9 @@
                     channel.QueueDeclare(queue2, false, false, false, null);
 
                     //将队列与交换机进行绑定
-                    channel.QueueBind(
-                        queue: queue1,
-                        exchange: exchangeName,
-                        routingKey: "topic.*");
+                    channel.QueueBind(queue: queue1, exchange: exchangeName, routingKey: "topic.*");
 
-                    channel.QueueBind(
-                      queue: queue2,
-                      exchange: exchangeName,
-                      routingKey: "topic.#");
+                    channel.QueueBind(queue: queue2, exchange: exchangeName, routingKey: "topic.#");
 
 #if debug
                     // queue1和queue2都可以收到消息

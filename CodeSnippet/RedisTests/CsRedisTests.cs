@@ -16,9 +16,9 @@ namespace CodeSnippet.Redis
     using System.Threading;
 
     /// <summary>
-    /// 使用CSRedis
+    /// 使用CSRedisCore
     /// </summary>
-    [TestCategory("StandAloneCsRedisTests")]
+    [TestCategory("CsRedisTests")]
     [TestClass()]
     public class CsRedisTests
     {
@@ -28,7 +28,6 @@ namespace CodeSnippet.Redis
 
         private static readonly IServiceCollection services = new ServiceCollection();
         private static CSRedisClient csRedis;
-
         private static readonly Stopwatch sw = new();
 
         /// <summary>
@@ -52,7 +51,6 @@ namespace CodeSnippet.Redis
         {
             Console.WriteLine($"TestName: {_testContext.TestName}");
             sw.Restart();
-            // 这里为了测试注入时的声明周期
             Console.WriteLine($"{nameof(csRedis)} HashCode: {csRedis.GetHashCode()}");
         }
 
@@ -158,7 +156,6 @@ namespace CodeSnippet.Redis
         public void CacheShell()
         {
             string value = "wangpengliang";
-
 #if debug
             // 一般的缓存代码，如不封装比较繁琐
             var cacheValue = csRedis.Get("name");

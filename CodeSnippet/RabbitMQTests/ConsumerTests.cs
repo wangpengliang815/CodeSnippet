@@ -1,5 +1,5 @@
 ﻿#define RabbitMQRuning
-namespace CodeSnippet.RabbitMQ
+namespace CodeSnippet.RabbitMQTests
 {
     using System;
     using System.Text;
