@@ -1,148 +1,306 @@
-﻿namespace CommonLib.RabbitMQ
+﻿using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+
+namespace CommonLib.RabbitMQ
 {
-    using EasyNetQ;
-
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    public class RabbitMQHelper
+    public class RabbitMQHelper : RabbitBase
     {
-        private readonly IBus bus;
-
-        public RabbitMQHelper(string connectionString)
+        public RabbitMQHelper(params string[] hosts) : base(hosts)
         {
-            if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentNullException(nameof(connectionString));
-            bus = RabbitHutch.CreateBus(connectionString);
+
         }
 
-        public async Task PublishAsync<TMessage>(TMessage message, string topic = null)
-            where TMessage : class
+        public RabbitMQHelper(params (string, int)[] hostAndPorts) : base(hostAndPorts)
         {
-            if (string.IsNullOrWhiteSpace(topic))
-                await bus.PubSub.PublishAsync(message);
-            else
-                await bus.PubSub.PublishAsync(message, x => x.WithTopic(topic));
+
         }
 
-        public async Task PublishAsync<TMessage>(List<TMessage> messages, string topic)
-            where TMessage : class
+        #region 简单队列/Work
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <param name="message"></param>
+        /// <param name="options"></param>
+        public void Publish(string queue, string message, QueueOptions options = null)
         {
-            foreach (var message in messages)
+            options ??= new QueueOptions();
+            IModel channel = GetChannel();
+            channel.QueueDeclare(queue, options.Durable, false, options.AutoDelete, options.Arguments ?? new Dictionary<string, object>());
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            channel.BasicPublish("", queue, null, buffer);
+            channel.Close();
+        }
+
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <param name="message"></param>
+        /// <param name="configure"></param>
+        public void Publish(string queue, string message, Action<QueueOptions> configure)
+        {
+            QueueOptions options = new();
+            configure?.Invoke(options);
+            Publish(queue, message, options);
+        }
+        #endregion
+
+        #region 订阅模式、路由模式、Topic模式
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="exchange"></param>
+        /// <param name="routingKey"></param>
+        /// <param name="message"></param>
+        /// <param name="options"></param>
+        public void Publish(string exchange, string routingKey, string message, ExchangeQueueOptions options = null)
+        {
+            options ??= new ExchangeQueueOptions();
+            IModel channel = GetChannel();
+            channel.ExchangeDeclare(exchange, string.IsNullOrEmpty(options.Type) ?
+                RabbitMQExchangeType.Fanout : options.Type, options.Durable, options.AutoDelete, options.Arguments ?? new Dictionary<string, object>());
+            if (options.QueueAndRoutingKey != null)
             {
-                if (string.IsNullOrWhiteSpace(topic))
-                    await bus.PubSub.PublishAsync(message);
-                else
-                    await bus.PubSub.PublishAsync(message, x => x.WithTopic(topic));
-                Thread.Sleep(50);
+                foreach ((string, string) t in options.QueueAndRoutingKey)
+                {
+                    if (!string.IsNullOrEmpty(t.Item1))
+                    {
+                        channel.QueueBind(t.Item1, exchange, t.Item2 ?? "", options.BindArguments ?? new Dictionary<string, object>());
+                    }
+                }
+            }
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            channel.BasicPublish(exchange, routingKey, null, buffer);
+            channel.Close();
+        }
+
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="exchange"></param>
+        /// <param name="routingKey"></param>
+        /// <param name="message"></param>
+        /// <param name="configure"></param>
+        public void Publish(string exchange, string routingKey, string message, Action<ExchangeQueueOptions> configure)
+        {
+            ExchangeQueueOptions options = new();
+            configure?.Invoke(options);
+            Publish(exchange, routingKey, message, options);
+        }
+        #endregion   
+
+        public class RabbitMQConsumer : RabbitBase
+        {
+            public RabbitMQConsumer(params string[] hosts) : base(hosts)
+            {
+
+            }
+
+            public RabbitMQConsumer(params (string, int)[] hostAndPorts) : base(hostAndPorts)
+            {
+
+            }
+
+            public event Action<RecieveResult> Received;
+
+            /// <summary>
+            /// 构造消费者
+            /// </summary>
+            /// <param name="channel"></param>
+            /// <param name="options"></param>
+            /// <returns></returns>
+            private IBasicConsumer ConsumeInternal(IModel channel, ConsumeQueueOptions options)
+            {
+                EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (sender, e) =>
+                {
+                    try
+                    {
+                        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                        if (!options.AutoAck)
+                        {
+                            cancellationTokenSource.Token.Register(() =>
+                            {
+                                channel.BasicAck(e.DeliveryTag, false);
+                            });
+                        }
+                        Received?.Invoke(new RecieveResult(e, cancellationTokenSource));
+                    }
+                    catch { }
+                };
+                if (options.FetchCount != null)
+                {
+                    channel.BasicQos(0, options.FetchCount.Value, false);
+                }
+                return consumer;
+            }
+
+            #region 普通模式、Work模式
+            /// <summary>
+            /// 消费消息
+            /// </summary>
+            /// <param name="queue"></param>
+            /// <param name="options"></param>
+            public ListenResult Listen(string queue, ConsumeQueueOptions options = null)
+            {
+                options = options ?? new ConsumeQueueOptions();
+                IModel channel = GetChannel();
+                channel.QueueDeclare(queue, options.Durable, false, options.AutoDelete, options.Arguments ?? new Dictionary<string, object>());
+                IBasicConsumer consumer = ConsumeInternal(channel, options);
+                channel.BasicConsume(queue, options.AutoAck, consumer);
+                ListenResult result = new ListenResult();
+                result.Token.Register(() =>
+                {
+                    try
+                    {
+                        channel.Close();
+                        channel.Dispose();
+                    }
+                    catch { }
+                });
+                return result;
+            }
+
+            /// <summary>
+            /// 消费消息
+            /// </summary>
+            /// <param name="queue"></param>
+            /// <param name="configure"></param>
+            public ListenResult Listen(string queue, Action<ConsumeQueueOptions> configure)
+            {
+                ConsumeQueueOptions options = new ConsumeQueueOptions();
+                configure?.Invoke(options);
+                return Listen(queue, options);
+            }
+
+            #endregion
+            #region 订阅模式、路由模式、Topic模式
+            /// <summary>
+            /// 消费消息
+            /// </summary>
+            /// <param name="exchange"></param>
+            /// <param name="queue"></param>
+            /// <param name="options"></param>
+            public ListenResult Listen(string exchange, string queue, ExchangeConsumeQueueOptions options = null)
+            {
+                options = options ?? new ExchangeConsumeQueueOptions();
+                IModel channel = GetChannel();
+                channel.QueueDeclare(queue, options.Durable, false, options.AutoDelete, options.Arguments ?? new Dictionary<string, object>());
+                if (options.RoutingKeys != null && !string.IsNullOrEmpty(exchange))
+                {
+                    foreach (string key in options.RoutingKeys)
+                    {
+                        channel.QueueBind(queue, exchange, key, options.BindArguments);
+                    }
+                }
+                IBasicConsumer consumer = ConsumeInternal(channel, options);
+                channel.BasicConsume(queue, options.AutoAck, consumer);
+                ListenResult result = new ListenResult();
+                result.Token.Register(() =>
+                {
+                    try
+                    {
+                        channel.Close();
+                        channel.Dispose();
+                    }
+                    catch { }
+                });
+                return result;
+            }
+            /// <summary>
+            /// 消费消息
+            /// </summary>
+            /// <param name="exchange"></param>
+            /// <param name="queue"></param>
+            /// <param name="configure"></param>
+            public ListenResult Listen(string exchange, string queue, Action<ExchangeConsumeQueueOptions> configure)
+            {
+                ExchangeConsumeQueueOptions options = new ExchangeConsumeQueueOptions();
+                configure?.Invoke(options);
+                return Listen(exchange, queue, options);
+            }
+            #endregion
+        }
+        public class RecieveResult
+        {
+            private CancellationTokenSource cancellationTokenSource;
+            public RecieveResult(BasicDeliverEventArgs arg, CancellationTokenSource cancellationTokenSource)
+            {
+                Body = Encoding.UTF8.GetString(arg.Body.ToArray());
+                ConsumerTag = arg.ConsumerTag;
+                DeliveryTag = arg.DeliveryTag;
+                Exchange = arg.Exchange;
+                Redelivered = arg.Redelivered;
+                RoutingKey = arg.RoutingKey;
+                this.cancellationTokenSource = cancellationTokenSource;
+            }
+
+            /// <summary>
+            /// 消息体
+            /// </summary>
+            public string Body { get; private set; }
+            /// <summary>
+            /// 消费者标签
+            /// </summary>
+            public string ConsumerTag { get; private set; }
+            /// <summary>
+            /// Ack标签
+            /// </summary>
+            public ulong DeliveryTag { get; private set; }
+            /// <summary>
+            /// 交换机
+            /// </summary>
+            public string Exchange { get; private set; }
+            /// <summary>
+            /// 是否Ack
+            /// </summary>
+            public bool Redelivered { get; private set; }
+            /// <summary>
+            /// 路由
+            /// </summary>
+            public string RoutingKey { get; private set; }
+
+            public void Commit()
+            {
+                if (cancellationTokenSource == null || cancellationTokenSource.IsCancellationRequested) return;
+
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+                cancellationTokenSource = null;
+            }
+        }
+        public class ListenResult
+        {
+            private readonly CancellationTokenSource cancellationTokenSource;
+
+            /// <summary>
+            /// CancellationToken
+            /// </summary>
+            public CancellationToken Token { get { return cancellationTokenSource.Token; } }
+            /// <summary>
+            /// 是否已停止
+            /// </summary>
+            public bool Stoped { get { return cancellationTokenSource.IsCancellationRequested; } }
+
+            public ListenResult()
+            {
+                cancellationTokenSource = new CancellationTokenSource();
+            }
+
+            /// <summary>
+            /// 停止监听
+            /// </summary>
+            public void Stop()
+            {
+                cancellationTokenSource.Cancel();
             }
         }
 
-        /// <summary>
-        /// 给指定队列发送一条信息
-        /// </summary>
-        /// <param name="queue">队列名称</param>
-        /// <param name="message">消息</param>
-        public async Task SendAsync<TMessage>(string queue, TMessage message)
-            where TMessage : class
-        {
-            await bus.SendReceive.SendAsync(queue, message);
-        }
-
-        /// <summary>
-        /// 给指定队列批量发送信息
-        /// </summary>
-        /// <param name="queue">队列名称</param>
-        /// <param name="messages">消息</param>
-        public async Task SendManyAsync<TMessage>(string queue, IList<TMessage> messages)
-            where TMessage : class
-        {
-            foreach (var message in messages)
-            {
-                await bus.SendReceive.SendAsync(queue, message);
-                Thread.Sleep(50);
-            }
-        }
-
-        /// <summary>
-        /// 从指定队列接收一天信息，并做相关处理。
-        /// </summary>
-        /// <param name="queue">队列名称</param>
-        /// <param name="process">
-        /// 消息处理委托方法
-        /// <para>
-        /// <example>
-        /// 例如：
-        /// <code>
-        /// message=>Task.Factory.StartNew(()=>{
-        ///     Console.WriteLine(message);
-        /// })
-        /// </code>
-        /// </example>
-        /// </para>
-        /// </param>
-        public async Task ReceiveAsync<TMessage>(string queue, Func<TMessage, Task> handler)
-            where TMessage : class
-        {
-            await bus.SendReceive.ReceiveAsync(queue, handler);
-        }
-
-        /// <summary>
-        /// 消息订阅
-        /// </summary>
-        /// <param name="subscriptionId">消息订阅标识</param>
-        /// <param name="process">
-        /// 消息处理委托方法
-        /// <para>
-        /// <example>
-        /// 例如：
-        /// <code>
-        /// message=>Task.Factory.StartNew(()=>{
-        ///     Console.WriteLine(message);
-        /// })
-        /// </code>
-        /// </example>
-        /// </para>
-        /// </param>
-        public async Task SubscribeAsync<TMessage>(string subscriptionId, Func<TMessage, Task> handler)
-            where TMessage : class
-        {
-            await bus.PubSub.SubscribeAsync<TMessage>(subscriptionId, message => handler(message));
-        }
-
-        /// <summary>
-        /// 消息订阅
-        /// </summary>
-        /// <param name="subscriptionId">消息订阅标识</param>
-        /// <param name="process">
-        /// 消息处理委托方法
-        /// <para>
-        /// <example>
-        /// 例如：
-        /// <code>
-        /// message=>Task.Factory.StartNew(()=>{
-        ///     Console.WriteLine(message);
-        /// })
-        /// </code>
-        /// </example>
-        /// </para>
-        /// </param>
-        /// <param name="topic">topic</param>
-        public async Task SubscribeWithTopicAsync<TMessage>(string subscriptionId, Func<TMessage, Task> process, string topic)
-            where TMessage : class
-        {
-            await bus.PubSub.SubscribeAsync<TMessage>(subscriptionId, message => process(message), x => x.WithTopic(topic));
-        }
-
-        /// <summary>
-        /// 资源释放
-        /// </summary>
-        public void Dispose()
-        {
-            if (bus != null) bus.Dispose();
-        }
     }
 }
-
