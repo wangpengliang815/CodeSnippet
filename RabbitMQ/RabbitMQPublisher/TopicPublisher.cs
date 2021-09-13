@@ -1,7 +1,10 @@
 ﻿namespace RabbitMQPublisher
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
+
+    using CommonLib.RabbitMQ;
 
     using RabbitMQ.Client;
 
@@ -13,14 +16,36 @@
     /// </summary>
     static class TopicPublisher
     {
+        private static readonly string exchangeName = $"test.exchange.topic";
+
         static void Main(string[] args)
         {
+            using RabbitMQHelper mq = new(new string[] { "192.168.181.191" });
+            mq.UserName = "guest";
+            mq.Password = "guest";
+            mq.Port = 5672;
+
             while (true)
             {
                 Console.WriteLine("消息发布者:模式{topic}=>输入消息内容");
                 string message = Console.ReadLine();
+
                 if (!string.IsNullOrEmpty(message))
                 {
+                    // routingKey = "test.one.one":只有test.topic.queue2可以收到消息,因为#匹配0个或多个单词
+                    // routingKey = "test.one"    :两个queue都可以收到消息
+                    string routingKey = "test.one.one";
+
+                    mq.Publish(exchangeName, routingKey, message, new ExchangeQueueOptions
+                    {
+                        Type = RabbitMQExchangeType.Topic,
+                        QueueAndRoutingKey = new List<Tuple<string, string>>() {
+                              new Tuple<string, string>("test.topic.queue1", "test.*"),
+                              new Tuple<string, string>("test.topic.queue2", "test.#")
+                        }
+                    });
+
+#if rabbitMQClient
                     ConnectionFactory factory = BasePublisher.CreateRabbitMqConnection();
                     using var connection = factory.CreateConnection();
                     using var channel = connection.CreateModel();
@@ -41,20 +66,21 @@
 
                     channel.QueueBind(queue: queue2, exchange: exchangeName, routingKey: "topic.#");
 
-#if debug
                     // queue1和queue2都可以收到消息
                     channel.BasicPublish(
                         exchange: exchangeName,
                         routingKey: "topic.test",
                         basicProperties: null,
                         body: Encoding.UTF8.GetBytes(message));
-#endif
+
                     // 只有queue2可以收到消息,因为.#可以匹配一个或者多个字符语句而.*只能匹配单个
                     channel.BasicPublish(
                         exchange: exchangeName,
                         routingKey: "topic.test.test",
                         basicProperties: null,
                         body: Encoding.UTF8.GetBytes(message));
+                }
+#endif
                 }
             }
         }

@@ -15,7 +15,7 @@
             // RabbitMQ连接工厂
             factory = new ConnectionFactory()
             {
-                HostName = "192.168.31.191",
+                HostName = "192.168.181.191",
                 // 用户名
                 UserName = "guest",
                 // 密码

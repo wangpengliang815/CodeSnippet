@@ -1,8 +1,6 @@
 ﻿#define RabbitMQRuning
 namespace CodeSnippet.RabbitMQTests
 {
-    using CommonLib.RabbitMQ;
-
     using global::RabbitMQ.Client;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,7 +19,6 @@ namespace CodeSnippet.RabbitMQTests
     public class RabbitMqClientPublisherTests : TestBase
     {
         private static TestContext _testContext;
-
         private static readonly Stopwatch sw = new();
 
         [ClassInitialize]
@@ -55,40 +52,25 @@ namespace CodeSnippet.RabbitMQTests
         [TestMethod]
         public void PublisherTest_Basic()
         {
-            //// 创建名称为hello的队列
-            //channel.QueueDeclare(queue: "hello", durable: false, exclusive: false, autoDelete: false, arguments: null);
+            // 创建名称为hello的队列
+            channel.QueueDeclare(queue: "hello", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
-            //string message = "hello world";
-            //byte[] messageBody = Encoding.UTF8.GetBytes(message);
-            //try
-            //{
-            //    // 消息发送,mandatory=如果发布了一个设置了“强制”标志的消息，但未能送达，则代理将消息返回给发送的客户端（通过basic.return AMQP 0-9-1命令）。 要获得此类通知，客户端可以订阅IModel.BasicReturn事件。 如果没有附加事件的监听器，则返回的消息将被静默地丢弃。
-            //    channel.BasicPublish(exchange: "", routingKey: "hello", basicProperties: null, body: messageBody, mandatory: true);
-
-            //    channel.BasicReturn += (sender, message) =>
-            //    {
-            //        Console.WriteLine(Encoding.UTF8.GetString(message.Body.ToArray()));
-            //    };
-            //}
-            //catch (Exception ex)
-            //{
-            //    Assert.Fail(ex.Message);
-            //}
-
-            RabbitMQHelper2.connectionString = "192.168.31.191;guest;guest";
-            IConnection conn = RabbitMQHelper2.CreateMQConnectionInPools();
-            for (int i = 0; i < 1000; i++)
+            string message = "hello world";
+            byte[] messageBody = Encoding.UTF8.GetBytes(message);
+            try
             {
-                string result = RabbitMQHelper2.SendMsg(conn, "test.direct.queue1", Faker.RandomNumber.Next(1, 1000).ToString(), false);
+                // 消息发送,mandatory=如果发布了一个设置了“强制”标志的消息，但未能送达，则代理将消息返回给发送的客户端（通过basic.return AMQP 0-9-1命令）。 要获得此类通知，客户端可以订阅IModel.BasicReturn事件。 如果没有附加事件的监听器，则返回的消息将被静默地丢弃。
+                channel.BasicPublish(exchange: "", routingKey: "hello", basicProperties: null, body: messageBody, mandatory: true);
+
+                channel.BasicReturn += (sender, message) =>
+                {
+                    Console.WriteLine(Encoding.UTF8.GetString(message.Body.ToArray()));
+                };
             }
-            //RabbitMQHelper.ConsumeMsg(conn, "test.direct.queue1", false, (msg) =>
-            //{
-            //    Console.WriteLine(msg);
-            //    return ConsumeAction.ACCEPT;
-            //}, (error, a) =>
-            //{
-            //    Console.WriteLine(error);
-            //});
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
         }
 
         /// <summary>

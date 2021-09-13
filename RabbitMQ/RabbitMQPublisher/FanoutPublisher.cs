@@ -1,11 +1,8 @@
 ﻿namespace RabbitMQPublisher
 {
-    using EasyNetQ;
-
-    using RabbitMQ.Client;
+    using CommonLib.RabbitMQ;
 
     using System;
-    using System.Text;
 
     /// <summary>
     /// 发布订阅模式(fanout),消息会发送到exchange,所有订阅了exchange的queue都可以收到消息
@@ -13,14 +10,25 @@
     /// </summary>
     internal static class FanoutPublisher
     {
+        private static readonly string exchangeName = $"test.exchange.fanout";
+
         private static void Main(string[] args)
         {
+            // 消息生产
+            using RabbitMQHelper mq = new(new string[] { "192.168.181.191" });
+            mq.UserName = "guest";
+            mq.Password = "guest";
+            mq.Port = 5672;
+
             while (true)
             {
                 Console.WriteLine("消息发布者:模式{fanout}=>输入消息内容");
                 string message = Console.ReadLine();
                 if (!string.IsNullOrEmpty(message))
                 {
+                    mq.Publish(exchangeName, "", message);
+
+#if rabbitMQClient
                     // RabbitMQ连接工厂
                     ConnectionFactory factory = BasePublisher.CreateRabbitMqConnection();
                     // 建立连接
@@ -45,6 +53,7 @@
                     channel.QueueBind(queue: queue2, exchange: exchangeName, routingKey: "");
 
                     channel.BasicPublish(exchange: exchangeName, routingKey: "", basicProperties: null, body: Encoding.UTF8.GetBytes(message));
+#endif
                 }
             }
         }

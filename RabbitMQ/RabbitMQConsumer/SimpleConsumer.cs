@@ -2,48 +2,49 @@
 {
     using CommonLib.RabbitMQ;
 
-    using System;
+    using RabbitMQ.Client;
+    using RabbitMQ.Client.Events;
 
-    internal static class FanoutConsumer
+    using System;
+    using System.Text;
+
+    static class SimpleConsumer
     {
+        private static readonly string queueName = "test.simple.queue";
+
         private static void Main(string[] args)
         {
+            Console.WriteLine($"{nameof(SimpleConsumer)}:");
+
             using RabbitMQHelper mq = new(new string[] { "192.168.181.191" });
             mq.UserName = "guest";
             mq.Password = "guest";
             mq.Port = 5672;
 
-            Console.WriteLine("input queueName...");
-            var input = Console.ReadLine();
-
-            switch (input)
+            mq.Received += (result) =>
             {
-                case "1":
-                    mq.Received += (result) =>
-                    {
-                        Console.WriteLine($"message：{result.Body}");
-                        result.Commit();
-                    };
-                    mq.Listen("test.fanout.queue1", new ConsumeQueueOptions { AutoAck = false });
-                    Console.ReadLine();
-                    break;
-                case "2":
-                    mq.Received += (result) =>
-                    {
-                        Console.WriteLine($"message：{result.Body}");
-                        result.Commit();
-                    };
-                    mq.Listen("test.fanout.queue2", new ConsumeQueueOptions { AutoAck = false });
-                    Console.ReadLine();
-                    break;
-            }
+                Console.WriteLine($"message：{result.Body}");
+                result.Commit();
+            };
+            mq.Listen(queueName, new ConsumeQueueOptions { AutoAck = false});
+
 #if rabbitMQClient
+            // RabbitMQ连接工厂
             ConnectionFactory factory = BaseConsumer.CreateRabbitMqConnection();
+
+            // 建立连接
             using IConnection connection = factory.CreateConnection();
+
+            // 创建信道
             using IModel channel = connection.CreateModel();
+
             EventingBasicConsumer consumer = new(channel);
+
+            // 每次只能向消费者发送一条信息,在消费者未确认之前,不再向它发送信息
             channel.BasicQos(0, 1, false);
-            channel.BasicConsume(queue: "test.fanout.queue1", autoAck: false, consumer: consumer);
+
+            channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+
             // 绑定消息接收后的事件委托
             consumer.Received += (model, message) =>
             {
@@ -55,6 +56,7 @@
                     multiple: false);
             };
 #endif
+            Console.ReadLine();
         }
     }
 }

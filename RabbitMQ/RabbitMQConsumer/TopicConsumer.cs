@@ -1,5 +1,7 @@
 ﻿namespace RabbitMQConsumer
 {
+    using CommonLib.RabbitMQ;
+
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
 
@@ -8,8 +10,22 @@
 
     internal static class TopicConsumer
     {
+        private static readonly string exchangeName = $"test.exchange.topic";
+
         private static void Main(string[] args)
         {
+            using RabbitMQHelper mq = new(new string[] { "192.168.181.191" });
+            mq.UserName = "guest";
+            mq.Password = "guest";
+            mq.Port = 5672;
+
+            mq.Received += (result) =>
+            {
+                Console.WriteLine($"message：{result.Body}");
+                result.Commit();
+            };
+            mq.Listen(exchangeName, "test.topic.queue2", new ExchangeConsumeQueueOptions { AutoAck = false });
+#if rabbitMQClient
             Console.WriteLine($"{nameof(TopicConsumer)}:");
             // RabbitMQ连接工厂
             ConnectionFactory factory = BaseConsumer.CreateRabbitMqConnection();
@@ -50,6 +66,7 @@
             channel.BasicConsume(queue: queueName,
                   autoAck: false,
                   consumer: consumer);
+#endif
             Console.ReadLine();
         }
     }
