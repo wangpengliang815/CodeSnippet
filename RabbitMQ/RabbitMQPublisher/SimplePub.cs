@@ -9,7 +9,7 @@
     /// 点对点：简单队列
     /// 消费者多开时,默认采用轮询(均摊)机制,也就是Work模式
     /// </summary>
-    internal static class SimplePublisher
+    internal static class SimplePub
     {
         private static readonly string queueName = "test.simple.queue";
 

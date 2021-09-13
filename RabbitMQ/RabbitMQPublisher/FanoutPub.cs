@@ -8,7 +8,7 @@
     /// 发布订阅模式(fanout),消息会发送到exchange,所有订阅了exchange的queue都可以收到消息
     /// type=fanout：routingKey不会生效
     /// </summary>
-    internal static class FanoutPublisher
+    internal static class FanoutPub
     {
         private static readonly string exchangeName = $"test.exchange.fanout";
 

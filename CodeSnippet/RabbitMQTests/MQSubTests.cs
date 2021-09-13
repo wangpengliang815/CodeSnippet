@@ -8,9 +8,9 @@ namespace CodeSnippet.RabbitMQTests
     using global::RabbitMQ.Client.Events;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    [TestCategory("RabbitMQ")]
+    [TestCategory("RebbitMQ-Client")]
     [TestClass()]
-    public class ConsumerTests : TestBase
+    public class MQSubTests : TestBase
     {
         [TestCleanup]
         public void TestCleanup()

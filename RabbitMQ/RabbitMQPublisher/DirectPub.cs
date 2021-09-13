@@ -8,7 +8,7 @@
     /// 路由模式(direct),消息会发送到exchange
     /// 所有订阅了当前Exchange并且routingKey完全匹配的Queue都可以收到消息
     /// </summary>
-    internal static class DirectPublisher
+    internal static class DirectPub
     {
         private static readonly string exchangeName = $"test.exchange.direct";
 

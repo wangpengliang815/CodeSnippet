@@ -8,13 +8,13 @@
     using System;
     using System.Text;
 
-    static class SimpleConsumer
+    static class SimpleSub
     {
         private static readonly string queueName = "test.simple.queue";
 
         private static void Main(string[] args)
         {
-            Console.WriteLine($"{nameof(SimpleConsumer)}:");
+            Console.WriteLine($"{nameof(SimpleSub)}:");
 
             using RabbitMQHelper mq = new(new string[] { "192.168.181.191" });
             mq.UserName = "guest";

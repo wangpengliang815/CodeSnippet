@@ -4,7 +4,7 @@
 
     using RabbitMQ.Client;
 
-    public static class BaseConsumer
+    public static class BaseSub
     {
         public static ConnectionFactory CreateRabbitMqConnection()
         {
