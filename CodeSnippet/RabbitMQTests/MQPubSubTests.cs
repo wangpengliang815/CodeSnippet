@@ -406,22 +406,22 @@
         public void Dlx_PubTest()
         {
             string dlxExchangeName = "test.dlx.exchange";
+            string dlxQueueName = "test.dlx.queue";
+            channel.ExchangeDeclare(dlxExchangeName, type: "topic");
+            channel.QueueDeclare(queue: dlxQueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            // # 表示只要有消息到达了死信的exchange,都会路由到这个死信队列
+            channel.QueueBind(queue: dlxQueueName, exchange: dlxExchangeName, routingKey: "#");
 
-            // 声明正常交换机/queue
-            string testExchangeName = "test.exchange";
-            string testQueueName = "test.queue";
-            channel.ExchangeDeclare(testExchangeName, type: "fanout");
             // 声明队列时添加死信参数
             Dictionary<string, object> agruments = new()
             {
-                { " x-dead-letter-exchang", dlxExchangeName }
+                { "x-dead-letter-exchange", dlxExchangeName }
             };
-            channel.QueueDeclare(queue: testQueueName, durable: false, exclusive: false, autoDelete: false, arguments: agruments);
-            channel.QueueBind(queue: testQueueName, exchange: testExchangeName, routingKey: "dlx");
+            channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: agruments);
 
             for (int i = 0; i < 10; i++)
             {
-                channel.BasicPublish(exchange: testExchangeName, routingKey: "dlx", basicProperties: null, body: Encoding.UTF8.GetBytes(i.ToString()));
+                channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: null, body: Encoding.UTF8.GetBytes(i.ToString()));
             }
             Assert.IsTrue(true);
         }
@@ -448,7 +448,7 @@
                 }
             };
 
-            channel.BasicConsume(queue: "test.queue", autoAck: false, consumer: consumer);
+            channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
             Thread.Sleep(3000);
         }
     }
