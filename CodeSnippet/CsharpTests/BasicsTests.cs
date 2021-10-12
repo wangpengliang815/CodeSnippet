@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 
 /// <summary>
@@ -303,7 +302,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         public void ImplicitConversion()
         {
             int a = 10;
-            //自动隐式类型转换
+            // 自动隐式类型转换
             double b = a;
             Assert.AreEqual(10, b);
         }
@@ -319,7 +318,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         public void ExplicitConversion()
         {
             double a = 10;
-            //显式将double类型转换为int
+            // 显式将double类型转换为int
             int b = (int)a;
             Assert.AreEqual(10, b);
         }
@@ -361,11 +360,11 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         [TestMethod]
         public void Conversion_IntTryParse()
         {
-            //正常 i=2
+            // 正常 i=2
             Assert.AreEqual(true, int.TryParse("2", out int i));
-            //转换失败,false
+            // 转换失败,false
             Assert.AreEqual(false, int.TryParse("2.6", out int j));
-            //转换失败,false
+            // 转换失败,false
             Assert.AreEqual(false, int.TryParse(null, out int k));
 
             Console.WriteLine($"{i},{j},{k}");
@@ -557,7 +556,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// nameof
+        /// 运算符: nameof
         /// </summary>
         /// <remarks>
         /// 接受一个符号属性或方法,返回名称
@@ -620,7 +619,6 @@ namespace CodeSnippet.CsharpTests.BasicsTests
             Assert.AreEqual("wangli", p3.Address);
         }
     }
-
     public class Person
     {
         public string Address { get; set; }
