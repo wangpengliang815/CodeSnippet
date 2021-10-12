@@ -1,17 +1,20 @@
-﻿namespace CodeSnippet.Csharp
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using System;
+using System.Buffers;
+using System.Collections.Generic;
+
+namespace CodeSnippet.Csharp
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using System;
-    using System.Buffers;
-    using System.Collections.Generic;
-
+    /// <summary>
+    /// 
+    /// </summary>
     [TestCategory("Basics")]
     [TestClass()]
     public class BasicsTests
     {
         /// <summary>
-        /// 变量定义
+        /// 变量
         /// </summary>
         [TestMethod()]
         public void VariableDefinition()
