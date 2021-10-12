@@ -190,8 +190,7 @@ namespace CodeSnippet.CsharpTests
         }
     }
 
-    public class MyArray<T>
-          where T : new()
+    public class MyArray<T> where T : new()
     {
         private readonly T[] array;
 
@@ -209,7 +208,6 @@ namespace CodeSnippet.CsharpTests
         {
             array[index] = value;
         }
-
     }
 
     public class Print
@@ -242,7 +240,6 @@ namespace CodeSnippet.CsharpTests
 
         public string Age { get; set; }
     }
-
 
     public class Cat : Animal
     {
