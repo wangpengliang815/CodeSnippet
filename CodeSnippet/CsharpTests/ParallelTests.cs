@@ -1,4 +1,4 @@
-﻿namespace CodeSnippet.Csharp
+﻿namespace CodeSnippet.CsharpTests
 {
     using System;
     using System.Collections.Concurrent;

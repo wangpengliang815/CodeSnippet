@@ -1,133 +1,11 @@
-﻿namespace CodeSnippet.Csharp
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace CodeSnippet.CsharpTests
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    public class MyArray<T>
-          where T : new()
-    {
-        private readonly T[] array;
-
-        public MyArray(int size)
-        {
-            array = new T[size + 1];
-        }
-
-        public T GetItem(int index)
-        {
-            return array[index];
-        }
-
-        public void SetItem(int index, T value)
-        {
-            array[index] = value;
-        }
-
-    }
-
-    public class Print
-    {
-        public void PrintType<Tentity>()
-            where Tentity : new()
-        {
-            Tentity t = new();
-            Console.WriteLine(t.GetType());
-        }
-    }
-
-    public interface IPrint<T>
-    {
-        void Add(T t);
-    }
-
-    public class Print<T> : IPrint<T>
-    {
-        public void Add(T t)
-        {
-            Console.WriteLine("");
-        }
-    }
-
-
-    public class Animal
-    {
-        public string Name { get; set; }
-
-        public string Age { get; set; }
-    }
-
-
-    public class Cat : Animal
-    {
-        public string Color { get; set; }
-    }
-
-    /// <summary>
-    /// out 协变 只能是返回结果
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface ICustomerListOut<out T>
-    {
-        T Get();
-    }
-
-    public class CustomerListOut<T> : ICustomerListOut<T>
-    {
-        public T Get()
-        {
-            return default;
-        }
-    }
-
-    /// <summary>
-    /// 逆变 只能是方法参数
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface ICustomerListIn<in T>
-    {
-        void Show(T t);
-    }
-
-    public class CustomerListIn<T> : ICustomerListIn<T>
-    {
-        public void Show(T t)
-        {
-            Console.WriteLine($"{t.GetType()}");
-        }
-    }
-
-    /// <summary>
-    /// 类中的静态类型无论实例化多少次，在内存中只会有一个
-    /// 静态构造函数只会执行一次
-    /// 在泛型类中，T类型不同
-    /// 每个不同的T类型，都会产生一个不同的副本，所以会产生不同的静态属性、不同的静态构造函数
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-#pragma warning disable S1118 // Utility classes should not have public constructors
-    public class GenericCache<T>
-#pragma warning restore S1118 // Utility classes should not have public constructors
-    {
-#pragma warning disable S3963 // "static" fields should be initialized inline
-        static GenericCache()
-        {
-            _CachedValue = string.Format("{0}_{1}",
-                typeof(T).FullName, DateTime.Now.ToString("yyyyMMddHHmmss.fff"));
-        }
-#pragma warning restore S3963 // "static" fields should be initialized inline
-
-#pragma warning disable S2743 // Static fields should not be used in generic types
-        private static readonly string _CachedValue = "";
-#pragma warning restore S2743 // Static fields should not be used in generic types
-
-        public static string GetCache()
-        {
-            return _CachedValue;
-        }
-    }
-
     [TestCategory("Genericity")]
     [TestClass()]
     public class GenericityTests
@@ -309,6 +187,128 @@
                 Console.WriteLine(GenericCache<string>.GetCache());
             }
             Assert.IsTrue(true);
+        }
+    }
+
+    public class MyArray<T>
+          where T : new()
+    {
+        private readonly T[] array;
+
+        public MyArray(int size)
+        {
+            array = new T[size + 1];
+        }
+
+        public T GetItem(int index)
+        {
+            return array[index];
+        }
+
+        public void SetItem(int index, T value)
+        {
+            array[index] = value;
+        }
+
+    }
+
+    public class Print
+    {
+        public void PrintType<Tentity>()
+            where Tentity : new()
+        {
+            Tentity t = new();
+            Console.WriteLine(t.GetType());
+        }
+    }
+
+    public interface IPrint<T>
+    {
+        void Add(T t);
+    }
+
+    public class Print<T> : IPrint<T>
+    {
+        public void Add(T t)
+        {
+            Console.WriteLine("");
+        }
+    }
+
+
+    public class Animal
+    {
+        public string Name { get; set; }
+
+        public string Age { get; set; }
+    }
+
+
+    public class Cat : Animal
+    {
+        public string Color { get; set; }
+    }
+
+    /// <summary>
+    /// out 协变 只能是返回结果
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface ICustomerListOut<out T>
+    {
+        T Get();
+    }
+
+    public class CustomerListOut<T> : ICustomerListOut<T>
+    {
+        public T Get()
+        {
+            return default;
+        }
+    }
+
+    /// <summary>
+    /// 逆变 只能是方法参数
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface ICustomerListIn<in T>
+    {
+        void Show(T t);
+    }
+
+    public class CustomerListIn<T> : ICustomerListIn<T>
+    {
+        public void Show(T t)
+        {
+            Console.WriteLine($"{t.GetType()}");
+        }
+    }
+
+    /// <summary>
+    /// 类中的静态类型无论实例化多少次，在内存中只会有一个
+    /// 静态构造函数只会执行一次
+    /// 在泛型类中，T类型不同
+    /// 每个不同的T类型，都会产生一个不同的副本，所以会产生不同的静态属性、不同的静态构造函数
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+#pragma warning disable S1118 // Utility classes should not have public constructors
+    public class GenericCache<T>
+#pragma warning restore S1118 // Utility classes should not have public constructors
+    {
+#pragma warning disable S3963 // "static" fields should be initialized inline
+        static GenericCache()
+        {
+            _CachedValue = string.Format("{0}_{1}",
+                typeof(T).FullName, DateTime.Now.ToString("yyyyMMddHHmmss.fff"));
+        }
+#pragma warning restore S3963 // "static" fields should be initialized inline
+
+#pragma warning disable S2743 // Static fields should not be used in generic types
+        private static readonly string _CachedValue = "";
+#pragma warning restore S2743 // Static fields should not be used in generic types
+
+        public static string GetCache()
+        {
+            return _CachedValue;
         }
     }
 }
