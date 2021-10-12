@@ -4,17 +4,17 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 
+/// <summary>
+/// 基础知识合集
+/// </summary>
 namespace CodeSnippet.CsharpTests.BasicsTests
 {
-    /// <summary>
-    /// 基础知识合集
-    /// </summary>
-    [TestCategory("Basics")]
+    [TestCategory("BasicsTests")]
     [TestClass()]
     public class BasicsTests
     {
         /// <summary>
-        /// 变量
+        /// 变量定义
         /// </summary>
         [TestMethod()]
         public void VariableDefinition()
@@ -328,7 +328,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         /// ToString()
         /// </summary>
         [TestMethod]
-        public void MethodConversion_ToString()
+        public void Conversion_ToString()
         {
             int a = 10;
             string s = a.ToString();
@@ -343,7 +343,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         /// 用于将string类型参数转换为int,需要注意:string类型参数不能为null,并且也只能是各种整型,不能是浮点型
         /// </remarks>
         [TestMethod]
-        public void MethodConversion_IntParse()
+        public void Conversion_IntParse()
         {
             //正常
             Assert.AreEqual(2, int.Parse("2"));
@@ -359,7 +359,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         /// int.TryParse()
         /// </summary>
         [TestMethod]
-        public void MethodConversion_IntTryParse()
+        public void Conversion_IntTryParse()
         {
             //正常 i=2
             Assert.AreEqual(true, int.TryParse("2", out int i));
@@ -443,7 +443,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// 前置,先加再判断
+        /// 前置:先加再判断
         /// </summary>
         [TestMethod]
         public void OperatorPreposition()
@@ -453,7 +453,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// 后置,先判断再加
+        /// 后置:先判断再加
         /// </summary>
         [TestMethod]
         public void OperatorPostposition()
@@ -464,7 +464,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// ?:
+        /// 运算符: ?:
         /// </summary>
         [TestMethod]
         public void Operator_Ternary()
@@ -496,7 +496,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// is
+        /// 运算符: is
         /// </summary>
         [TestMethod]
         public void Operator_Is()
@@ -507,7 +507,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// as
+        /// 运算符: as
         /// </summary>
         /// <remarks>
         /// 用于执行引用类型的显示类型转换,如果类型兼容,转换成功
@@ -525,7 +525,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// sizeof
+        /// 运算符: sizeof
         /// </summary>
         /// <remarks>
         /// 确定栈中值类型需要的长度
@@ -545,7 +545,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// typeof
+        /// 运算符: typeof
         /// </summary>
         /// <remarks>
         /// 返回特定类型的System.Type对象
@@ -569,7 +569,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// ??
+        /// 运算符: ??
         /// </summary>
         /// <remarks>
         /// 空合并运算符
@@ -593,7 +593,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
-        /// ?
+        /// 运算符: ?
         /// </summary>
         [TestMethod]
         public void Operator_Empty()
@@ -631,12 +631,6 @@ namespace CodeSnippet.CsharpTests.BasicsTests
             Address = person?.Address;
         }
 
-        /// <summary>
-        /// 运算符重载
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Person operator +(Person a, Person b)
         {
             Person person = new()
