@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace CodeSnippet.CsharpTests
 {
-    [TestCategory("Genericity")]
+    [TestCategory("GenericityTest")]
     [TestClass()]
     public class GenericityTests
     {
@@ -55,7 +55,7 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void GenericityClass()
         {
-            MyArray<int> arr = new MyArray<int>(5);
+            MyArray<int> arr = new(5);
             for (int i = 0; i < 5; i++)
             {
                 arr.SetItem(i, i);
@@ -64,7 +64,6 @@ namespace CodeSnippet.CsharpTests
             {
                 Console.Write(arr.GetItem(i));
             }
-            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -73,10 +72,20 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void GenericityMethod()
         {
-            Print p = new Print();
+            Print p = new();
             p.PrintType<int>();
             p.PrintType<double>();
-            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// 泛型接口
+        /// </summary>
+        [TestMethod]
+        public void GenericityInterface()
+        {
+            Print p = new();
+            p.PrintType<int>();
+            p.PrintType<double>();
         }
 
         /// <summary>
@@ -212,8 +221,7 @@ namespace CodeSnippet.CsharpTests
 
     public class Print
     {
-        public void PrintType<Tentity>()
-            where Tentity : new()
+        public void PrintType<Tentity>() where Tentity : new()
         {
             Tentity t = new();
             Console.WriteLine(t.GetType());
