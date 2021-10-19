@@ -4,12 +4,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// 泛型
-/// </summary>
 namespace CodeSnippet.CsharpTests
 {
-    [TestCategory("GenericityTest")]
+    [TestCategory("GenericityTests")]
     [TestClass()]
     public class GenericityTests
     {

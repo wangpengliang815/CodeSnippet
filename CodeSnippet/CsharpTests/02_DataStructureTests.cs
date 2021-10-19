@@ -4,9 +4,6 @@ using System;
 using System.Buffers;
 using System.Collections;
 
-/// <summary>
-/// 数据结构
-/// </summary>
 namespace CodeSnippet.CsharpTests.DataStructureTests
 {
     [TestCategory("DataStructureTests")]

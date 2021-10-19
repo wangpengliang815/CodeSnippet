@@ -1,11 +1,12 @@
-﻿namespace CodeSnippet.CsharpTests
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    [TestCategory("Delegate")]
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+
+namespace CodeSnippet.CsharpTests
+{
+    [TestCategory("DelegateTests")]
     [TestClass()]
     public class DelegateTests
     {
@@ -165,7 +166,7 @@
         /// 委托闭包陷阱
         /// </summary>
         [TestMethod]
-        public void Delegate_Closure()
+        public void Delegate_Closure()                                                                                                                                                                                                                                                                                                                                                                                                             
         {
             //List<Action> list = new List<Action>();
             //for (int i = 0; i < 5; i++)

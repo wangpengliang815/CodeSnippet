@@ -3,9 +3,6 @@
 using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// 基础知识合集
-/// </summary>
 namespace CodeSnippet.CsharpTests.BasicsTests
 {
     [TestCategory("BasicsTests")]
