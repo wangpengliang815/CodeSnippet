@@ -4,12 +4,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// 泛型
+/// </summary>
 namespace CodeSnippet.CsharpTests
 {
     [TestCategory("GenericityTest")]
     [TestClass()]
     public class GenericityTests
     {
+        public delegate void SayHi<T>(T t);
+
         /// <summary>
         /// 泛型优点
         /// </summary>
@@ -17,7 +22,7 @@ namespace CodeSnippet.CsharpTests
         public void GenericityMerit()
         {
             // 非泛型集合ArrayList
-            ArrayList arrs = new ArrayList
+            ArrayList arrs = new()
             {
                 "wang",
                 100
@@ -55,15 +60,13 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void GenericityClass()
         {
-            MyArray<int> arr = new(5);
-            for (int i = 0; i < 5; i++)
-            {
-                arr.SetItem(i, i);
-            }
-            for (int i = 0; i < 5; i++)
-            {
-                Console.Write(arr.GetItem(i));
-            }
+            MyArray<int> genericInt = new();
+            genericInt.t = 123;
+            Console.WriteLine(genericInt.t);
+
+            MyArray<string> genericStr = new();
+            genericStr.t = "123";
+            Console.WriteLine(genericStr.t);
         }
 
         /// <summary>
@@ -83,9 +86,24 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void GenericityInterface()
         {
-            Print p = new();
-            p.PrintType<int>();
-            p.PrintType<double>();
+            ClassADAL<string> a = new();
+            a.Add("hello");
+
+            ClassBDAL<string> b = new();
+            b.Add("hello");
+        }
+
+        /// <summary>
+        /// 泛型委托
+        /// </summary>
+        [TestMethod]
+        public void GenericityDelegate()
+        {
+            SayHi<int> a = new((p) => { Console.WriteLine(p); });
+            a.Invoke(123);
+
+            SayHi<string> b = new((p) => { Console.WriteLine(p); });
+            b.Invoke("123");
         }
 
         /// <summary>
@@ -98,29 +116,31 @@ namespace CodeSnippet.CsharpTests
         public void GenericityCovariant()
         {
             // 直接声明Animal类
-            Animal animal = new Animal();
-            Console.WriteLine($"{animal.GetType()}");
+            Animal animal = new();
+            Console.WriteLine($"直接声明Animal类,{animal.GetType()}");
 
             // 直接声明Cat类
-            Cat cat = new Cat();
-            Console.WriteLine($"{cat.GetType()}");
+            Cat cat = new();
+            Console.WriteLine($"直接声明Cat类,{cat.GetType()}");
 
             // 声明子类对象指向父类
             Animal animal2 = new Cat();
-            Console.WriteLine($"{animal2.GetType()}");
+            Console.WriteLine($"声明子类对象指向父类,{animal2.GetType()}");
 
             // 声明Animal类的集合
-            List<Animal> listAnimal = new List<Animal>();
-            foreach (var item in listAnimal)
+            List<Animal> listAnimal = new();
+            for (int i = 0; i < 3; i++)
             {
-                Console.WriteLine($"{item.GetType()}");
+                listAnimal.Add(new Animal { });
+                Console.WriteLine($"声明Animal类的集合,{i},{listAnimal[i].GetType()}");
             }
 
             // 声明Cat类的集合
-            List<Cat> listCat = new List<Cat>();
-            foreach (var item in listCat)
+            List<Cat> listCat = new();
+            for (int i = 0; i < 3; i++)
             {
-                Console.WriteLine($"{item.GetType()}");
+                listCat.Add(new Cat());
+                Console.WriteLine($"声明Cat类的集合,{i},{listAnimal[i].GetType()}");
             }
 
 #if debug
@@ -133,7 +153,6 @@ namespace CodeSnippet.CsharpTests
 
             ICustomerListOut<Animal> customerList2 = new CustomerListOut<Cat>();
             Console.WriteLine($"{customerList2.GetType()}");
-            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -199,48 +218,51 @@ namespace CodeSnippet.CsharpTests
         }
     }
 
-    public class MyArray<T> where T : new()
+    /// <summary>
+    /// 泛型类
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class MyArray<T>
     {
-        private readonly T[] array;
-
-        public MyArray(int size)
-        {
-            array = new T[size + 1];
-        }
-
-        public T GetItem(int index)
-        {
-            return array[index];
-        }
-
-        public void SetItem(int index, T value)
-        {
-            array[index] = value;
-        }
+        public T t;
     }
 
+    /// <summary>
+    /// 泛型方法
+    /// </summary>
     public class Print
     {
-        public void PrintType<Tentity>() where Tentity : new()
+        public void PrintType<T>() where T : new()
         {
-            Tentity t = new();
+            T t = new();
             Console.WriteLine(t.GetType());
         }
     }
 
-    public interface IPrint<T>
+    /// <summary>
+    /// 泛型接口
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IDAL<T>
     {
         void Add(T t);
     }
 
-    public class Print<T> : IPrint<T>
+    public class ClassADAL<T> : IDAL<T>
     {
         public void Add(T t)
         {
-            Console.WriteLine("");
+            Console.WriteLine(t);
         }
     }
 
+    public class ClassBDAL<T> : IDAL<T>
+    {
+        public void Add(T t)
+        {
+            Console.WriteLine(t);
+        }
+    }
 
     public class Animal
     {

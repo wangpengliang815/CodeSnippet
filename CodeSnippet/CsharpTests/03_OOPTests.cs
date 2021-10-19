@@ -40,9 +40,6 @@ using System;
 ///</remarks>
 namespace CodeSnippet.CsharpTests.OopTests
 {
-    /// <summary>
-    /// 面向对象
-    /// </summary>
     [TestCategory("OopTests")]
     [TestClass()]
     public class OopTests
