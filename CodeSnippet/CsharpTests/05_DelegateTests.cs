@@ -193,6 +193,9 @@ namespace CodeSnippet.CsharpTests
             Assert.IsTrue(true);
         }
 
+        /// <summary>
+        /// 王凯宁是个笨蛋
+        /// </summary>
         public void Test()
         {
             Console.WriteLine();
