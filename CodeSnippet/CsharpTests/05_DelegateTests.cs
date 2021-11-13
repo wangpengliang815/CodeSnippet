@@ -166,7 +166,7 @@ namespace CodeSnippet.CsharpTests
         /// 委托闭包陷阱
         /// </summary>
         [TestMethod]
-        public void Delegate_Closure()                                                                                                                                                                                                                                                                                                                                                                                                             
+        public void Delegate_Closure()
         {
             //List<Action> list = new List<Action>();
             //for (int i = 0; i < 5; i++)
@@ -191,6 +191,11 @@ namespace CodeSnippet.CsharpTests
                 t();
             }
             Assert.IsTrue(true);
+        }
+
+        public void Test()
+        {
+            Console.WriteLine();
         }
     }
 }
