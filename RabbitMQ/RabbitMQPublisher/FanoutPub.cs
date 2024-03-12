@@ -15,9 +15,9 @@
         private static void Main(string[] args)
         {
             // 消息生产
-            using RabbitMQHelper mq = new(new string[] { "47.93.34.29" });
-            mq.UserName = "root";
-            mq.Password = "wpl19950815";
+            using RabbitMQHelper mq = new(new string[] { "" });
+            mq.UserName = "";
+            mq.Password = "";
             mq.Port = 5672;
 
             while (true)
