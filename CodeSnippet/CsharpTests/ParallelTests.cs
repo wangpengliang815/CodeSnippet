@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestCategory("Parallel")]
@@ -101,7 +102,8 @@
                 watch.Stop();
                 Console.WriteLine("串行添加,总数20000000,耗时{0}", watch.ElapsedMilliseconds);
                 watch.Restart();
-                Parallel.For(0, 20000000, j =>
+                bag.Clear();
+                Parallel.For(0, 100, j =>
                 {
                     bag.Add(j);
                 });

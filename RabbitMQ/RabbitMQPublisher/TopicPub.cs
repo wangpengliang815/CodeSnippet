@@ -20,9 +20,9 @@
 
         static void Main(string[] args)
         {
-            using RabbitMQHelper mq = new(new string[] { "192.168.181.191" });
-            mq.UserName = "guest";
-            mq.Password = "guest";
+            using RabbitMQHelper mq = new(new string[] { "test.exchange.topic" });
+            mq.UserName = "root";
+            mq.Password = "wpl19950815";
             mq.Port = 5672;
 
             while (true)

@@ -16,9 +16,9 @@
         {
             Console.WriteLine($"{nameof(SimpleSub)}:");
 
-            using RabbitMQHelper mq = new(new string[] { "192.168.181.191" });
-            mq.UserName = "guest";
-            mq.Password = "guest";
+            using RabbitMQHelper mq = new(new string[] { "47.93.34.29" });
+            mq.UserName = "root";
+            mq.Password = "wpl19950815";
             mq.Port = 5672;
 
             mq.Received += (result) =>
@@ -26,7 +26,7 @@
                 Console.WriteLine($"message：{result.Body}");
                 result.Commit();
             };
-            mq.Listen(queueName, new ConsumeQueueOptions { AutoAck = false});
+            mq.Listen(queueName, new ConsumeQueueOptions { AutoAck = false });
 
 #if rabbitMQClient
             // RabbitMQ连接工厂

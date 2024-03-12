@@ -27,9 +27,9 @@ namespace CodeSnippet.CsharpTests
             {
                 using var client = new WebClient
                 {
-#if debug
-                    Proxy = new WebProxy("proxy1.bj.petrochina", 8080)
-#endif
+//#if debug
+//                    Proxy = new WebProxy("proxy1.bj.petrochina", 8080)
+//#endif
                 };
                 Console.WriteLine($"开始调用 id = {id}：{Watch.ElapsedMilliseconds} ms");
                 var result = client.DownloadString(address);
@@ -84,7 +84,7 @@ namespace CodeSnippet.CsharpTests
                 using var client = new WebClient
                 {
 #if debug
-                    Proxy = new WebProxy("proxy1.bj.petrochina", 8080)
+                    //Proxy = new WebProxy("proxy1.bj.petrochina", 8080)
 #endif
                 };
                 Console.WriteLine($"开始调用 id = {id}：{Watch.ElapsedMilliseconds} ms");

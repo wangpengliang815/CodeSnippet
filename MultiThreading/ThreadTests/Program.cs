@@ -7,7 +7,7 @@
     {
         static void Main(string[] args)
         {
-            ThreadSync_Mutex_Example_01();
+            Thread_Contention_Example_02();
         }
 
         /// <summary>
