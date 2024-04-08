@@ -8,7 +8,7 @@ namespace CodeSnippet.CsharpTests
 {
     [TestCategory("GenericityTests")]
     [TestClass()]
-    public class GenericityTests
+    public class GenericTests
     {
         public delegate void SayHi<T>(T t);
 

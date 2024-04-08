@@ -38,7 +38,7 @@ using System;
 ///    实例化子类后，可同时执行子类和父类的方法和属性，如同名方法，则执行子类的方法
 ///    子类构造函数可以使用base关键字指定调用的父类构造函数
 ///</remarks>
-namespace CodeSnippet.CsharpTests.OopTests
+namespace CodeSnippet.CsharpTests
 {
     [TestCategory("OopTests")]
     [TestClass()]
@@ -48,31 +48,22 @@ namespace CodeSnippet.CsharpTests.OopTests
         /// 类的定义
         /// </summary>
         [TestMethod]
-        public void ClassDefinition()
+        public void ClassDefine()
         {
             Person person = new()
             {
-                _name = "wang",
+                Name = "wang",
                 Age = 100
             };
-            Console.WriteLine($"{person._name},{person.Age},{person.Birthday},{person.readonlyValue},{Person._describe}");
-        }
+            Console.WriteLine($"{person.Name},{person.Age},{person.Birthday},{person.readonlyValue},{Person._describe}");
 
-        /// <summary>
-        /// 匿名类型
-        /// </summary>
-        ///<remarks>
-        /// 继承自object且没有名称的类
-        ///</remarks>
-        [TestMethod]
-        public void AnonymousType()
-        {
-            var person = new
+            // 匿名类型定义
+            var person2 = new
             {
                 Name = "wang",
                 Age = "100"
             };
-            Console.WriteLine($"{person.Name},{person.Age}");
+            Console.WriteLine($"{person2.Name},{person2.Age}");
         }
 
         /// <summary>
@@ -91,7 +82,6 @@ namespace CodeSnippet.CsharpTests.OopTests
             p.Print("wang", "test", "bj");
 
             p.Print("wang", new string[] { "1", "2" });
-            Assert.IsTrue(true);
         }
 
         [TestMethod]
@@ -104,35 +94,42 @@ namespace CodeSnippet.CsharpTests.OopTests
         ///</remarks>
         public void ParameterPassing()
         {
+            static void SetIntValue(int i)
+            {
+                i += 100;
+            }
+
+
+            static void SetStringValue(string oldStr)
+            {
+                oldStr = "world";
+            }
+
+            int i = 1;
+            SetIntValue(i);
+            // i=1,i是值类型按值传递，此处传递给方法的其实是变量i的副本
+            Console.WriteLine(i);
+
+            string str = "hello";
+            SetStringValue(str);
+            // 此处正常理解应该返回hello,因为j是引用类型。
+            // 但其实因为string的“不变性”，所以在被调用方法中执行 oldStr = "world"时，此时并不会直接修改oldStr中的"hello"值为"world"，因为string类型是不变的，不可修改的
+            // 此时内存会重新分配一块内存，然后把这块内存中的值修改为 “world”，然后把内存中地址赋值给oldStr变量，所以此时str仍然指向 "hello"字符，而oldStr却改变了指向，它最后指向了"world"字符串
+            Console.WriteLine(str);
+
             ClassA classA = new() { Age = 1 };
-            ClassA.ChangeAge(classA);
+            classA.ChangeAge(classA);
             // output=100,TestA是类按引用传递
             Console.WriteLine(classA.Age);
-            Assert.AreEqual(100, classA.Age);
 
             StructA structA = new() { Age = 1 };
             StructA.ChangeAge(structA);
             // output=1,StructA是结构按值传递
             Console.WriteLine(structA.Age);
-            Assert.AreEqual(1, structA.Age);
-        }
 
-        [TestMethod]
-        /// <summary>
-        /// 参数传递ref
-        /// </summary>
-        ///<remarks>
-        /// 类是引用类型,作为参数时按引用传递
-        /// 结构是值类型,作为参数时按值传递
-        ///</remarks>
-        public void ParameterPassing_Ref()
-        {
-            StructB structB = new() { Age = 1 };
-            StructB.ChangeAge(ref structB);
+            StructA.ChangeAgeRef(ref structA);
             // output=100,使用ref参数可以通过引用传递值类型参数
-            Console.WriteLine(structB.Age);
-
-            Assert.AreEqual(100, structB.Age);
+            Console.WriteLine(structA.Age);
         }
 
         [TestMethod]
@@ -166,18 +163,10 @@ namespace CodeSnippet.CsharpTests.OopTests
             // test = p.height; 将可空类型赋值给test失败的,因为无法保证p.height是有值的
 
             // 使用HasValue属性
-#pragma warning disable IDE0059 // 不需要赋值
-#pragma warning disable S1854 // Unused assignments should be removed
             test = p.height.HasValue ? p.height.Value : -1;
-#pragma warning restore S1854 // Unused assignments should be removed
-#pragma warning restore IDE0059 // 不需要赋值
 
             // 使用空合并表达式简化
-#pragma warning disable IDE0059 // 不需要赋值
-#pragma warning disable S1854 // Unused assignments should be removed
             test = p.height ?? -1;
-#pragma warning restore S1854 // Unused assignments should be removed
-#pragma warning restore IDE0059 // 不需要赋值
 
             // 使用Value属性
             test = p.height.Value;
@@ -336,13 +325,27 @@ namespace CodeSnippet.CsharpTests.OopTests
         }
     }
 
+    /// <summary>
+    /// 类的定义
+    /// </summary>
     public class Person
     {
         // 实例成员：字段
-        public string _name;
+        private string _name;
         private int _age;
 
-        // 实例成员：属性
+        /// <summary>
+        /// 实例成员:属性
+        /// </summary>
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        /// <summary>
+        /// 实例成员:属性(控制赋值)
+        /// </summary>
         public int Age
         {
             get { return _age; }
@@ -355,23 +358,31 @@ namespace CodeSnippet.CsharpTests.OopTests
             }
         }
 
-        // 实例成员：只读字段
-        public readonly string readonlyValue;
-
-        // 实例成员：自动实现的属性
+        /// <summary>
+        /// 实例成员:自动实现的属性
+        /// </summary>
         public string Address { get; set; }
 
-        // 实例成员：只读属性
+        /// <summary>
+        /// 实例成员:只读属性
+        /// </summary>
         public DateTime Birthday { get; }
 
-        // 静态成员：只读字段
+        /// <summary>
+        /// 实例成员:只读字段
+        /// </summary>
+        public readonly string readonlyValue;
+
+        /// <summary>
+        /// 实例成员:可空类型(可以为空的值类型)
+        /// </summary>
+        public int? height;
+
+        // 静态成员:只读字段
         public readonly static string staticReadonlyValue;
 
-        // 静态成员：字段
+        // 静态成员:字段
         public static string _describe = "static field";
-
-        // 可空类型：指可以为空的值类型
-        public int? height;
 
         // 方法
         public void PrintAge()
@@ -379,20 +390,13 @@ namespace CodeSnippet.CsharpTests.OopTests
             Console.WriteLine(_age);
         }
 
-        // 如果方法实现只有一条语句,可以使用表达式体方法定义
-        public void PrintName() => Console.WriteLine(_name);
+        // 如果方法实现只有一条语句,可以使用表达式体方法定义，如下所示：
+        //public void PrintAge() => Console.WriteLine(_age);
 
         // 方法重载
         public void Print(string message) => Console.WriteLine(message);
 
-        public void Print(string name
-            , string messae) => Console.WriteLine($"name:{name},message:{messae}");
-
-        public void Print(Person person)
-        {
-            // person为null返回null
-            Address = person?.Address;
-        }
+        public void Print(string name, string messae) => Console.WriteLine($"name:{name},message:{messae}");
 
         // 可选参数
         public void Print(string name, string message, string address, int age = 100) => Console.WriteLine($"{name},{message},{address},{age}");
@@ -468,9 +472,9 @@ namespace CodeSnippet.CsharpTests.OopTests
     {
         public int Age { get; set; }
 
-        public static void ChangeAge(ClassA testA)
+        public void ChangeAge(ClassA obj)
         {
-            testA.Age = 100;
+            obj.Age = 100;
         }
     }
 
@@ -478,26 +482,21 @@ namespace CodeSnippet.CsharpTests.OopTests
     {
         public int Age { get; set; }
 
-        public static void ChangeAge(StructA testA)
+        public static void ChangeAge(StructA obj)
         {
-            testA.Age = 100;
+            obj.Age = 100;
         }
 
-        public static void ChangeAge(in StructA testA)
+        public static void ChangeAgeIn(in StructA obj)
         {
             // 使用in参数可以保证发送到方法内的数据不会更改
             //testA.Age = 100; -- error,因为它是只读的
-            Console.WriteLine(testA.Age);
+            Console.WriteLine(obj.Age);
         }
-    }
 
-    public struct StructB
-    {
-        public int Age { get; set; }
-
-        public static void ChangeAge(ref StructB testb)
+        public static void ChangeAgeRef(ref StructA obj)
         {
-            testb.Age = 100;
+            obj.Age = 100;
         }
     }
 }

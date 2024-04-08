@@ -3,45 +3,39 @@
 using System;
 using System.Collections.Generic;
 
-namespace CodeSnippet.CsharpTests.BasicsTests
+namespace CodeSnippet.CsharpTests
 {
     [TestCategory("BasicsTests")]
     [TestClass()]
     public class BasicsTests
     {
         /// <summary>
-        /// 变量定义
+        /// 变量定义相关
         /// </summary>
         [TestMethod()]
-        public void VariableDefinition()
+        public void VariableDefine()
         {
-            // 变量定义
+            // 正常变量定义
             string name = "wang";
             int age = 25;
             DateTime time = new(1995, 8, 15);
 
             // 同时声明多个同类型变量
-            string n1 = "wang",
-                   n2 = "li";
+            string n1 = "wang", n2 = "li";
 
             Assert.AreEqual("wang", name);
             Assert.AreEqual(25, age);
             Assert.AreEqual(new DateTime(1995, 8, 15), time);
             Assert.AreEqual("wang", n1);
             Assert.AreEqual("li", n2);
-        }
 
-        /// <summary>
-        /// 类型推断
-        /// </summary>
-        ///<remarks>
-        /// 运行时根据value推断出变量类型
-        ///</remarks>
-        [TestMethod()]
-        public void VariableTypeDeduce()
-        {
-            var name = "wang";
-            Assert.AreEqual("wang", name);
+            // 类型推断:运行时根据value推断出变量类型
+            var name2 = "wang";
+            Assert.AreEqual("wang", name2);
+
+            // 使用new表达式:左侧类型被指定后右侧不在需要指定类型
+            string name3 = new("wang2");
+            Assert.AreEqual("wang2", name3);
         }
 
         /// <summary>
@@ -67,26 +61,24 @@ namespace CodeSnippet.CsharpTests.BasicsTests
             int condition = 0;
             if (condition == 0)
             {
-                Console.WriteLine(0);
+                Assert.AreEqual(0, condition);
             }
             else if (condition == 1)
             {
-                Console.WriteLine(1);
+                Assert.AreEqual(1, condition);
             }
             else
             {
-                Console.WriteLine("other value");
+                Assert.IsTrue(condition != 0 && condition != 1);
             }
 
             // 如果条件分支中只有一条语句可以省略花括号
             if (condition == 0)
-                Console.WriteLine(0);
+                Assert.AreEqual(0, condition);
             else if (condition == 1)
-                Console.WriteLine(1);
+                Assert.AreEqual(1, condition);
             else
-                Console.WriteLine("other value");
-
-            Assert.IsTrue(condition == 0);
+                Assert.IsTrue(condition != 0 && condition != 1);
         }
 
         /// <summary>
@@ -99,16 +91,15 @@ namespace CodeSnippet.CsharpTests.BasicsTests
             switch (condition)
             {
                 case 0:
-                    Console.WriteLine(0);
+                    Assert.AreEqual(0, condition);
                     break;
                 case 1:
-                    Console.WriteLine(1);
+                    Assert.AreEqual(1, condition);
                     break;
                 default:
-                    Console.WriteLine("other value");
+                    Assert.IsTrue(condition != 0 && condition != 1);
                     break;
             }
-            Assert.IsTrue(condition == 0);
         }
 
         /// <summary>
@@ -174,7 +165,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         [TestMethod()]
         public void Circulation_Foreach()
         {
-            List<string> lists = new();
+            List<string> lists = [];
             for (int i = 0; i < 10; i++)
             {
                 lists.Add(i.ToString());
@@ -204,9 +195,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
                 if (i == 5)
                 {
                     Console.WriteLine("goto");
-#pragma warning disable S907 // "goto" statement should not be used,-sample code
                     goto login;
-#pragma warning restore S907 // "goto" statement should not be used,-sample code
                 }
                 Console.WriteLine(i);
             }
@@ -231,21 +220,6 @@ namespace CodeSnippet.CsharpTests.BasicsTests
                 }
                 Console.WriteLine(i);
             }
-
-            for (int i = 0; i < 10; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    if (j == 2)
-                    {
-                        // break如果在嵌套循环内部,只退出当前循环
-                        break;
-                    }
-                    Console.WriteLine($"j={j}");
-                }
-                Console.WriteLine($"i={i}");
-            }
-            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -265,7 +239,6 @@ namespace CodeSnippet.CsharpTests.BasicsTests
                 }
                 Console.WriteLine(i);
             }
-            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -286,7 +259,6 @@ namespace CodeSnippet.CsharpTests.BasicsTests
                 }
                 Console.WriteLine(i);
             }
-            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -327,9 +299,7 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         public void Conversion_ToString()
         {
             int a = 10;
-            string s = a.ToString();
-            Console.WriteLine(s);
-            Assert.IsTrue(true);
+            Assert.AreEqual("10", a.ToString());
         }
 
         /// <summary>
@@ -341,12 +311,13 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         [TestMethod]
         public void Conversion_IntParse()
         {
-            //正常
+            // 正常
             Assert.AreEqual(2, int.Parse("2"));
 #if debug
-            //错误:输入字符串格式错误
+            // 错误:输入字符串格式错误
             int.Parse("2.6");
-            //错误:值不能为null
+
+            // 错误:值不能为null
             int.Parse(null);
 #endif
         }
@@ -359,12 +330,10 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         {
             // 正常 i=2
             Assert.AreEqual(true, int.TryParse("2", out int i));
-            // 转换失败,false
-            Assert.AreEqual(false, int.TryParse("2.6", out int j));
-            // 转换失败,false
-            Assert.AreEqual(false, int.TryParse(null, out int k));
+            Assert.AreEqual(2, i);
 
-            Console.WriteLine($"{i},{j},{k}");
+            // 转换失败,false
+            Assert.AreEqual(false, int.TryParse("2.6", out _));
         }
 
         /// <summary>
@@ -377,12 +346,13 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         [TestMethod]
         public void Compare_ReferenceEquals()
         {
-            List<string> a = new() { "1", "2" };
-            List<string> b = new() { "1", "2" };
+            List<string> a = ["1", "2"];
+            List<string> b = ["1", "2"];
             string c = "1";
             string d = "1";
             Assert.AreEqual(true, ReferenceEquals(null, null));
             Assert.AreEqual(false, ReferenceEquals(a, b));
+
             // 字符串驻留池：对于相同的字符串，CLR不会为其分别分配内存，而是共享同一内存。
             Assert.AreEqual(true, ReferenceEquals(c, d));
         }
@@ -396,12 +366,12 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         [TestMethod]
         public void Compare_Equals()
         {
-            List<string> a = new() { "1", "2" };
-            List<string> b = new() { "1", "2" };
+            List<string> a = ["1", "2"];
+            List<string> b = ["1", "2"];
             string c = "1";
             string d = "1";
-            Assert.AreEqual(false, Equals(a, b));
-            Assert.AreEqual(true, Equals(c, d));
+            Assert.AreEqual(false, a.Equals(b));
+            Assert.AreEqual(true, c.Equals(d));
         }
 
         /// <summary>
@@ -413,8 +383,8 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         [TestMethod]
         public void Compare_StaticEquals()
         {
-            List<string> a = new() { "212", "2212" };
-            List<string> b = new() { "14343", "2443" };
+            List<string> a = ["1", "2"];
+            List<string> b = ["1", "2"];
             string c = "1";
             string d = "1";
             Assert.AreEqual(false, Equals(a, b));
@@ -429,8 +399,8 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         {
             int a = 10;
             int b = 10;
-            List<string> c = new() { "212", "2212" };
-            List<string> d = new() { "14343", "2443" };
+            List<string> c = ["1", "2"];
+            List<string> d = ["1", "2"];
             string e = "21";
             string f = "21";
             Assert.AreEqual(true, a == b);
@@ -457,17 +427,6 @@ namespace CodeSnippet.CsharpTests.BasicsTests
             int i = 0;
             Assert.AreEqual(0, i++);
             Console.WriteLine(i);
-        }
-
-        /// <summary>
-        /// 运算符: ?:
-        /// </summary>
-        [TestMethod]
-        public void Operator_Ternary()
-        {
-            int i = 0;
-            int j = i == 0 ? 10 : 20;
-            Assert.AreEqual(10, j);
         }
 
         /// <summary>
@@ -565,6 +524,42 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         }
 
         /// <summary>
+        /// 运算符: ?:
+        /// </summary>
+        [TestMethod]
+        public void Operator_Ternary()
+        {
+            int i = 0;
+            int j = i == 0 ? 10 : 20;
+            Assert.AreEqual(10, j);
+        }
+
+        /// <summary>
+        /// 运算符: ?.
+        /// </summary>
+        [TestMethod]
+        public void Operator_Empty()
+        {
+            string name = "wang";
+            Assert.AreEqual("WANG", name.ToUpper());
+
+            try
+            {
+                // NullReferenceException 因为name2为null
+                string name2 = null;
+                Assert.AreEqual(null, name2.ToUpper());
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is NullReferenceException);
+            }
+
+            // 使用?.使得程序不会运行出错但是name3结果为null
+            string name3 = null;
+            Assert.AreEqual(null, name3?.ToUpper());
+        }
+
+        /// <summary>
         /// 运算符: ??
         /// </summary>
         /// <remarks>
@@ -577,26 +572,12 @@ namespace CodeSnippet.CsharpTests.BasicsTests
         {
             int? a = null;
             int b;
-#pragma warning disable S2589 // Boolean expressions should not be gratuitous
             b = a ?? 10;
-#pragma warning restore S2589 // Boolean expressions should not be gratuitous
             Assert.AreEqual(10, b);
-            a = 3;
-#pragma warning disable S2583 // Conditionally executed code should be reachable
-            b = a ?? 10;
-#pragma warning restore S2583 // Conditionally executed code should be reachable
-            Assert.AreEqual(3, b);
-        }
 
-        /// <summary>
-        /// 运算符: ?
-        /// </summary>
-        [TestMethod]
-        public void Operator_Empty()
-        {
-            Person p = new();
-            p.Print(p);
-            Assert.AreEqual(null, p.Address);
+            a = 3;
+            b = a ?? 10;
+            Assert.AreEqual(3, b);
         }
 
         /// <summary>
@@ -615,24 +596,53 @@ namespace CodeSnippet.CsharpTests.BasicsTests
             Person p3 = p1 + p2;
             Assert.AreEqual("wangli", p3.Address);
         }
-    }
-    public class Person
-    {
-        public string Address { get; set; }
 
-        public void Print(Person person)
+        /// <summary>
+        /// 字符串插值
+        /// </summary>
+        [TestMethod]
+        public void String_FormattableString()
         {
-            // person为null返回null
-            Address = person?.Address;
+            string a = "hello", b = "world";
+            FormattableString c = $"{a}{b}";
+            for (int i = 0; i < c.ArgumentCount; i++)
+            {
+                Console.WriteLine($"{i},{c.GetArgument(i)}");
+            }
         }
 
-        public static Person operator +(Person a, Person b)
+        /// <summary>
+        /// 字符串Substring
+        /// </summary>
+        [TestMethod]
+        public void String_Substring()
         {
-            Person person = new()
+            string str = "hello world";
+            // 常见用法:截取从0开始到5结束
+            Console.WriteLine(str.Substring(0, 5));
+
+            // 使用范围运算符
+            Console.WriteLine(str[0..5]);
+
+            Console.WriteLine(str[..5]);
+
+            Console.WriteLine(str[6..11]);
+
+            Console.WriteLine(str[^11..^6]);
+        }
+
+        public class Person
+        {
+            public string Address { get; set; }
+
+            public static Person operator +(Person a, Person b)
             {
-                Address = a.Address + b.Address
-            };
-            return person;
+                Person person = new()
+                {
+                    Address = a.Address + b.Address
+                };
+                return person;
+            }
         }
     }
 }
