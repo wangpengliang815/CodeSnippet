@@ -129,7 +129,7 @@ namespace CodeSnippet.CsharpTests
 
         [TestMethod]
         /// <summary>
-        /// 尽管string属于引用类型，它在参数传递时表现出了按值传递的特色
+        /// 尽管string属于引用类型，但它在参数传递时表现出了按值传递的特色
         /// </summary>
         public void ParamByString()
         {
@@ -140,24 +140,73 @@ namespace CodeSnippet.CsharpTests
 
             string str = "hello";
             SetStringValue(str);
-            // 此处正常理解应该返回hello,因为j是引用类型。
+            // 此处正常理解应该返回world,因为str是引用类型。
             // 但其实因为string的“不变性”，所以在被调用方法中执行 oldStr = "world"时，此时并不会直接修改oldStr中的"hello"值为"world"，因为string类型是不变的，不可修改的
             // 此时内存会重新分配一块内存，然后把这块内存中的值修改为 “world”，然后把内存中地址赋值给oldStr变量，所以此时str仍然指向 "hello"字符，而oldStr却改变了指向，它最后指向了"world"字符串
             Console.WriteLine(str);
         }
 
+        /// <summary>
+        /// 参数传递int
+        /// </summary>
+        ///<remarks>
+        /// in修饰的参数表示参数通过引用传递,但是参数是只读的,所以在调用方法时必须先初始化
+        ///</remarks>
         [TestMethod]
+        public void ParamByIn()
+        {
+            static void SetIntValue(in int i)
+            {
+                // i += 100; // 因为in修饰的参数为只读所以不能直接赋值
+                Console.WriteLine($"{i}");
+            }
+
+            int i = 1;
+            SetIntValue(i);
+
+            // i=1,虽然是按引用传递但是in修饰的参数是只读所以无法在方法内部为i赋值
+            Assert.AreEqual(1, i);
+        }
+
+        /// <summary>
+        /// 参数传递ref
+        /// </summary>
+        ///<remarks>
+        /// ref 关键字使参数按引用传递。其效果是，当控制权传递回调用方法时，在方法中对参数的任何更改都将反映在该变量中。
+        /// 若要使用 ref 参数，则方法定义和调用方法都必须显式使用 ref 关键字
+        ///</remarks>
+        [TestMethod]
+        public void ParamByRef()
+        {
+            static void SetIntValue(ref int i)
+            {
+                i += 100; // ref修饰的参数会按引用传递
+            }
+
+            int i = 1;
+            SetIntValue(ref i); // ref修饰的参数方法定义和调用方法都必须显式使用ref关键字
+
+            Assert.AreEqual(101, i);
+        }
+
         /// <summary>
         /// 参数传递out
         /// </summary>
         ///<remarks>
-        /// 方法返回不同类型的多个值时可以使用out参数
+        /// out 关键字使参数按引用传递。与ref关键字类似，不同之处在于ref要求变量必须在传递之前进行初始化。
+        /// 若要使用 out 参数，方法定义和调用方法都必须显式使用out关键字。
         ///</remarks>
-        public void ParameterPassing_Out()
+        [TestMethod]
+        public void ParamByOut()
         {
-            Person p = new();
-            p.Print("wang", out bool result);
-            Assert.AreEqual(true, result);
+            static void SetIntValue(out int i)
+            {
+                i = 100; // out修饰的参数会按引用传递,在方法返回前必须给i赋值
+            }
+
+            SetIntValue(out int i); // out参数，方法定义和调用方法都必须显式使用out关键字
+
+            Assert.AreEqual(100, i);
         }
     }
 
