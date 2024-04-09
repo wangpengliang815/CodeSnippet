@@ -19,11 +19,11 @@ namespace CodeSnippet.CsharpTests
         public void GenericityMerit()
         {
             // 非泛型集合ArrayList
-            ArrayList arrs = new()
-            {
+            ArrayList arrs =
+            [
                 "wang",
                 100
-            };
+            ];
             // 问题1:性能
             foreach (var item in arrs)
             {
@@ -38,17 +38,16 @@ namespace CodeSnippet.CsharpTests
             }
 
             // 泛型集合
-            List<string> lists = new List<string>
-            {
+            List<string> lists =
+            [
                 "wang","li"
-            };
+            ];
 
             foreach (var item in lists)
             {
                 // 因为泛型集合在定义时已经确定了存储元素类型,所以不存在装箱/拆箱操作,也不会出现读取时的类型安全问题
                 Console.WriteLine(item);
             }
-            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -57,12 +56,16 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void GenericityClass()
         {
-            MyArray<int> genericInt = new();
-            genericInt.t = 123;
+            MyArray<int> genericInt = new()
+            {
+                t = 123
+            };
             Console.WriteLine(genericInt.t);
 
-            MyArray<string> genericStr = new();
-            genericStr.t = "123";
+            MyArray<string> genericStr = new()
+            {
+                t = "123"
+            };
             Console.WriteLine(genericStr.t);
         }
 
@@ -107,10 +110,10 @@ namespace CodeSnippet.CsharpTests
         /// 泛型协变(子类到父类的转换)
         /// </summary>
         /// <remarks>
-        /// out：协变covariant，用来修饰返回值
+        /// out：协变，用来修饰返回值
         /// </remarks>
         [TestMethod]
-        public void GenericityCovariant()
+        public void GenericityOut()
         {
             // 直接声明Animal类
             Animal animal = new();
@@ -125,48 +128,43 @@ namespace CodeSnippet.CsharpTests
             Console.WriteLine($"声明子类对象指向父类,{animal2.GetType()}");
 
             // 声明Animal类的集合
-            List<Animal> listAnimal = new();
-            for (int i = 0; i < 3; i++)
+            List<Animal> listAnimal = [];
+            for (int i = 0; i < 2; i++)
             {
                 listAnimal.Add(new Animal { });
-                Console.WriteLine($"声明Animal类的集合,{i},{listAnimal[i].GetType()}");
             }
 
             // 声明Cat类的集合
-            List<Cat> listCat = new();
-            for (int i = 0; i < 3; i++)
+            List<Cat> listCat = [];
+            for (int i = 0; i < 2; i++)
             {
                 listCat.Add(new Cat());
-                Console.WriteLine($"声明Cat类的集合,{i},{listAnimal[i].GetType()}");
             }
 
-#if debug
             // 一只Cat属于Animal，一群Cat也应该属于Animal。但实际上这样声明是错误的：因为List<Cat>和List<Animal>之间没有父子关系
-            List<Animal> list = new List<Cat>();
-#endif
-            // 泛型协变，IEnumerable泛型参数类型使用了out修饰
-            ICustomerListOut<Animal> customerList1 = new CustomerListOut<Animal>();
-            Console.WriteLine($"{customerList1.GetType()}");
+            //List<Animal> list = new List<Cat>();
 
-            ICustomerListOut<Animal> customerList2 = new CustomerListOut<Cat>();
-            Console.WriteLine($"{customerList2.GetType()}");
+            // 泛型协变，IEnumerable泛型参数类型使用了out修饰
+            IEnumerable<Animal> list2 = new List<Cat>();
+
+            Console.WriteLine($"{list2.GetType()}");
         }
 
         /// <summary>
         /// 泛型逆变(父类到子类的转换)
         /// </summary>
         /// <remarks>
-        /// int：协变contravariant，用来修饰返回值(子类到父类的转换)
+        /// in：逆变，用来传入参数(父类到子类的转换)
         /// </remarks>
         [TestMethod]
-        public void GenericityContravariant()
+        public void GenericityIn()
         {
             // 直接声明Animal类
-            Animal animal = new Animal();
+            Animal animal = new();
             Console.WriteLine($"{animal.GetType()}");
 
             // 直接声明Cat类
-            Cat cat = new Cat();
+            Cat cat = new();
             Console.WriteLine($"{cat.GetType()}");
 
             // 声明子类对象指向父类
@@ -174,24 +172,20 @@ namespace CodeSnippet.CsharpTests
             Console.WriteLine($"{animal2.GetType()}");
 
             // 声明Animal类的集合
-            List<Animal> listAnimal = new List<Animal>();
+            List<Animal> listAnimal = [];
             foreach (var item in listAnimal)
             {
                 Console.WriteLine($"{item.GetType()}");
             }
 
             // 声明Cat类的集合
-            List<Cat> listCat = new List<Cat>();
+            List<Cat> listCat = new();
             foreach (var item in listCat)
             {
                 Console.WriteLine($"{item.GetType()}");
             }
 
-            ICustomerListIn<Cat> customerListCat1 = new CustomerListIn<Cat>();
-            Console.WriteLine($"{customerListCat1.GetType()}");
 
-            ICustomerListIn<Cat> customerListCat2 = new CustomerListIn<Animal>();
-            Console.WriteLine($"{customerListCat2.GetType()}");
             Assert.IsTrue(true);
         }
 
@@ -291,7 +285,7 @@ namespace CodeSnippet.CsharpTests
     }
 
     /// <summary>
-    /// 逆变 只能是方法参数
+    /// in 逆变 只能是方法参数
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface ICustomerListIn<in T>
@@ -306,6 +300,8 @@ namespace CodeSnippet.CsharpTests
             Console.WriteLine($"{t.GetType()}");
         }
     }
+
+
 
     /// <summary>
     /// 类中的静态类型无论实例化多少次，在内存中只会有一个
