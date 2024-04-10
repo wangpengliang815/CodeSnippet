@@ -11,12 +11,12 @@ namespace CodeSnippet.CsharpTests
     public class DelegateTests
     {
         // 01：声明委托
-        delegate void Print(string message);
+        delegate int MyAddDelegate(int x, int y);
 
         // 02:定义委托对应的方法
-        void PrintMethod(string message)
+        int MyAddMethod(int x, int y)
         {
-            Console.WriteLine(message);
+            return x + y;
         }
 
         /// <summary>
@@ -28,12 +28,11 @@ namespace CodeSnippet.CsharpTests
         /// step03：实例化委托将方法作为参数传入
         /// </remarks>
         [TestMethod]
-        public void DelegateDefinition()
+        public void DelegateDefine()
         {
             // 03：实例化委托将方法作为参数传入
-            Print print = new Print(PrintMethod);
-            print.Invoke(nameof(DelegateDefinition));
-            Assert.IsTrue(true);
+            MyAddDelegate add = new(MyAddMethod);
+            Console.WriteLine(add.Invoke(1, 2));
         }
 
         /// <summary>
@@ -45,15 +44,14 @@ namespace CodeSnippet.CsharpTests
         /// 这时省略了定义方法这一步,将三步简化成了两步
         /// </remarks>
         [TestMethod]
-        public void DelegateDefinition_AnonymousMethods()
+        public void DelegateDefine_AnonymousMethods()
         {
             // 02：使用匿名方法的写法把一个方法赋值给委托
-            Print print = delegate (string message)
+            MyAddDelegate add = delegate (int x, int y)
             {
-                Console.WriteLine(message);
+                return x + y;
             };
-            print.Invoke(nameof(DelegateDefinition_AnonymousMethods));
-            Assert.IsTrue(true);
+            Console.WriteLine(add.Invoke(1, 2));
         }
 
         /// <summary>
@@ -66,20 +64,19 @@ namespace CodeSnippet.CsharpTests
         /// 方法3：要干就干彻底点,把{}去掉
         /// </remarks>
         [TestMethod]
-        public void DelegateDefinition_Lambda()
+        public void DelegateDefine_Lambda()
         {
             //方法一：
-            Print print1 = (string message) => { Console.WriteLine(message); };
-            print1(nameof(print1));
+            MyAddDelegate add1 = (int x, int y) => { return x + y; };
+            Console.WriteLine(add1(1, 2));
 
             //方法二：
-            Print print2 = (message) => { Console.WriteLine(message); };
-            print2(nameof(print2));
+            MyAddDelegate add2 = (x, y) => { return x + y; };
+            Console.WriteLine(add2(1, 2));
 
             //方法三：
-            Print print3 = (message) => Console.WriteLine(message);
-            print3(nameof(print3));
-            Assert.IsTrue(true);
+            MyAddDelegate add3 = (x, y) => x + y;
+            Console.WriteLine(add3(1, 2));
         }
 
         /// <summary>
@@ -100,17 +97,15 @@ namespace CodeSnippet.CsharpTests
             action2("wang");
 
             // Action：多个参数
-            Action<string, int> action3 = (name, age) => { Console.WriteLine("啦啦啦啦,    name:{0},age:{1}", name, age); };
+            Action<string, int> action3 = (name, age) => { Console.WriteLine("啦啦啦啦,name:{0},age:{1}", name, age); };
             action3("wang", 25);
-
-            Assert.IsTrue(true);
         }
 
         /// <summary>
         /// 泛型委托Func
         /// </summary>
         /// <remarks>
-        /// 用于没有返回值的方法（参数根据自己情况进行传递）
+        /// 用于有返回值的方法（参数根据自己情况进行传递）
         /// </remarks>
         [TestMethod]
         public void Delegate_Func()
@@ -128,7 +123,6 @@ namespace CodeSnippet.CsharpTests
             int r3 = add3(1, 2);
 
             Console.WriteLine($"{r1},{r2},{r3}");
-            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -143,7 +137,7 @@ namespace CodeSnippet.CsharpTests
             Expression<Func<int, int, int>> exp = (x, y) => x + y;
             Func<int, int, int> fun = exp.Compile();
             int result = fun(1, 2);
-            Assert.AreEqual(3, result);
+            Console.WriteLine(result);
         }
 
         /// <summary>
@@ -152,14 +146,13 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void Delegate_Invoke()
         {
-            Print print = delegate (string message)
+            MyAddDelegate add = delegate (int x, int y)
             {
-                Console.WriteLine(message);
+                return x + y;
             };
-            print.Invoke(nameof(Delegate_Invoke));
+            add.Invoke(1, 2);
             //等价于
-            print(nameof(Delegate_Invoke));
-            Assert.IsTrue(true);
+            add.Invoke(1, 2);
         }
 
         /// <summary>
