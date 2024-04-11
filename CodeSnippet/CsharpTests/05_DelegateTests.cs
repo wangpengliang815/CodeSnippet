@@ -267,6 +267,7 @@ namespace CodeSnippet.CsharpTests
         /// 委托闭包陷阱
         /// 所谓的闭包对象，指的是如果匿名方法（Lambda表达式）引用了某个局部变量，编译器就会自动将该引用提升到该闭包对象中。
         /// 即将for循环中的变量 i 修改成了引用闭包对象的公共变量i。这样一来，即使代码执行后离开了原局部变量 i 的作用域(如for循环)，包含该闭包对象的作用域也还存在。
+        /// 
         /// </summary>
         [TestMethod]
         public void Delegate_Closure()
