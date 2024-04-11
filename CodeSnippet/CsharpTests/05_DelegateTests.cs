@@ -11,10 +11,10 @@ namespace CodeSnippet.CsharpTests
     public class DelegateTests
     {
         // 01：声明委托
-        delegate int MyAddDelegate(int x, int y);
+        delegate int MyDelegate(int x, int y);
 
         // 02:定义委托对应的方法
-        int MyAddMethod(int x, int y)
+        int AddMethod(int x, int y)
         {
             return x + y;
         }
@@ -31,7 +31,7 @@ namespace CodeSnippet.CsharpTests
         public void DelegateDefine()
         {
             // 03：实例化委托将方法作为参数传入
-            MyAddDelegate add = new(MyAddMethod);
+            MyDelegate add = new(AddMethod);
             Console.WriteLine(add.Invoke(1, 2));
         }
 
@@ -47,7 +47,7 @@ namespace CodeSnippet.CsharpTests
         public void DelegateDefine_AnonymousMethods()
         {
             // 02：使用匿名方法的写法把一个方法赋值给委托
-            MyAddDelegate add = delegate (int x, int y)
+            MyDelegate add = delegate (int x, int y)
             {
                 return x + y;
             };
@@ -67,15 +67,15 @@ namespace CodeSnippet.CsharpTests
         public void DelegateDefine_Lambda()
         {
             //方法一：
-            MyAddDelegate add1 = (int x, int y) => { return x + y; };
+            MyDelegate add1 = (int x, int y) => { return x + y; };
             Console.WriteLine(add1(1, 2));
 
             //方法二：
-            MyAddDelegate add2 = (x, y) => { return x + y; };
+            MyDelegate add2 = (x, y) => { return x + y; };
             Console.WriteLine(add2(1, 2));
 
             //方法三：
-            MyAddDelegate add3 = (x, y) => x + y;
+            MyDelegate add3 = (x, y) => x + y;
             Console.WriteLine(add3(1, 2));
         }
 
@@ -146,7 +146,7 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void Delegate_Invoke()
         {
-            MyAddDelegate add = delegate (int x, int y)
+            MyDelegate add = delegate (int x, int y)
             {
                 return x + y;
             };
@@ -156,12 +156,122 @@ namespace CodeSnippet.CsharpTests
         }
 
         /// <summary>
+        /// 委托数组
+        /// </summary>
+        [TestMethod]
+        public void Delegate_Array()
+        {
+            // 定义委托数组
+            Func<double, double>[] delegates = [
+                 Math.MultipleTwo,
+                 Math.Square
+            ];
+
+            // 使用委托数组
+            for (int i = 0; i < delegates.Length; i++)
+            {
+                Console.WriteLine(delegates[i](3.7));
+                Console.WriteLine(delegates[i](3));
+            }
+        }
+
+        /// <summary>
+        /// 委托数组使用内置Func
+        /// </summary>
+        [TestMethod]
+        public void Delegate_Array2()
+        {
+            // 定义委托数组这里不再使用CalcDelegate委托
+            Func<double, double>[] delegates = [
+                 Math.MultipleTwo,
+                 Math.Square
+            ];
+
+            // 使用委托数组
+            for (int i = 0; i < delegates.Length; i++)
+            {
+                Console.WriteLine(delegates[i](3.7));
+                Console.WriteLine(delegates[i](3));
+            }
+        }
+
+        /// <summary>
+        /// 多播委托
+        /// 多播委托可以按顺序调用多个方法，为此委托的签名必须返回void，否则就只能得到委托最后调用的最后一个方法的结果。
+        /// </summary>
+        [TestMethod]
+        public void Delegate_Multicast()
+        {
+            // 定义委托数组这里不再使用CalcDelegate委托
+            Func<double, double> func = Math.MultipleTwo;
+            func += Math.Square;
+            // 这里只返回了3.0阶乘的值
+            Console.WriteLine(func(3));
+
+            // 使用+=和-=在委托中增减方法调用
+            Action action = () => { Console.WriteLine("hello"); };
+            action += () => { Console.WriteLine("world"); };
+            action();
+        }
+
+        /// <summary>
+        /// 多播委托异常处理
+        /// 使用多播委托，意味着多播委托里包含一个逐个调用的委托集合，如果集合其中一个方法抛出异常.整个迭代就会停止
+        /// </summary>
+        [TestMethod]
+        public void Delegate_MulticastException()
+        {
+            Action action = () =>
+            {
+                Console.WriteLine("hello");
+                throw new Exception();
+            };
+            action += () => { Console.WriteLine("world"); };
+            action();
+            // 委托只调用了第一个方法，因为第一个方法抛出了异常，委托的迭代停止
+        }
+
+        /// <summary>
+        /// 多播委托获取方法列表
+        /// 使用 Delegate的GetInvocationList() 方法自己迭代方法列表。
+        /// </summary>
+        [TestMethod]
+        public void Delegate_GetInvocationList()
+        {
+            Action action = () => { Console.WriteLine("hello"); throw new Exception(); };
+            action += () => { Console.WriteLine("world"); };
+            var delegates = action.GetInvocationList();
+
+            // 如果不处理异常程序在抛出异常后停止
+            //foreach (Action item in delegates)
+            //{
+            //    item();
+            //}
+
+            // 这里必须显式指定item类型为Action委托
+            foreach (Action item in delegates)
+            {
+                // 修改后，程序在捕获异常后，会迭代下一个方法
+                try
+                {
+                    item();
+                }
+                catch (Exception error)
+                {
+                    Console.WriteLine(error.Message);
+                }
+            }
+        }
+
+        /// <summary>
         /// 委托闭包陷阱
+        /// 所谓的闭包对象，指的是如果匿名方法（Lambda表达式）引用了某个局部变量，编译器就会自动将该引用提升到该闭包对象中。
+        /// 即将for循环中的变量 i 修改成了引用闭包对象的公共变量i。这样一来，即使代码执行后离开了原局部变量 i 的作用域(如for循环)，包含该闭包对象的作用域也还存在。
         /// </summary>
         [TestMethod]
         public void Delegate_Closure()
         {
-            //List<Action> list = new List<Action>();
+            //List<Action> list = new();
             //for (int i = 0; i < 5; i++)
             //{
             //    Action t = () => Console.WriteLine(i.ToString());
@@ -169,6 +279,7 @@ namespace CodeSnippet.CsharpTests
             //}
             //foreach (Action t in list)
             //{
+            //    // 此时其实内部的i用的是for循环的i所以会循环输出5
             //    t();
             //}
 
@@ -183,7 +294,19 @@ namespace CodeSnippet.CsharpTests
             {
                 t();
             }
-            Assert.IsTrue(true);
+        }
+    }
+
+    class Math
+    {
+        public static double MultipleTwo(double value)
+        {
+            return value * 2;
+        }
+
+        public static double Square(double value)
+        {
+            return value * value;
         }
     }
 }
