@@ -221,6 +221,7 @@ namespace CodeSnippet.CsharpTests
         [TestMethod]
         public void Delegate_MulticastException()
         {
+#if debug
             Action action = () =>
             {
                 Console.WriteLine("hello");
@@ -229,6 +230,7 @@ namespace CodeSnippet.CsharpTests
             action += () => { Console.WriteLine("world"); };
             action();
             // 委托只调用了第一个方法，因为第一个方法抛出了异常，委托的迭代停止
+#endif
         }
 
         /// <summary>

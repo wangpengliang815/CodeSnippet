@@ -3,8 +3,13 @@
 using System;
 using System.Buffers;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Security.Principal;
 
-namespace CodeSnippet.CsharpTests.DataStructureTests
+namespace CodeSnippet.CsharpTests
 {
     [TestCategory("DataStructureTests")]
     [TestClass()]
@@ -309,6 +314,65 @@ namespace CodeSnippet.CsharpTests.DataStructureTests
             ArrayPool<int> sharePool = ArrayPool<int>.Shared;
             Console.WriteLine($"{arrayPool},{sharePool}");
             Assert.IsTrue(sharePool != null);
+        }
+
+        /// <summary>
+        /// 可观察的集合
+        /// </summary>
+        [TestMethod]
+        public void ObservableArray()
+        {
+            var arr = new ObservableCollection<string>();
+            arr.CollectionChanged += (object sender, NotifyCollectionChangedEventArgs e) =>
+            {
+                if (e.OldItems != null)
+                {
+                    Console.WriteLine($"index:{e.OldStartingIndex}");
+                    Console.WriteLine("old items:");
+                    foreach (var item in e.OldItems)
+                    {
+                        Console.WriteLine(item);
+                    }
+                }
+
+                if (e.NewItems != null)
+                {
+                    Console.WriteLine($"index:{e.NewStartingIndex}");
+                    Console.WriteLine("new items:");
+                    foreach (var item in e.NewItems)
+                    {
+                        Console.WriteLine(item);
+                    }
+                }
+            };
+            arr.Add("One");
+            arr.Add("Two");
+            arr.Insert(1, "Three");
+            arr.Remove("One");
+        }
+
+        /// <summary>
+        /// 不可变集合
+        /// </summary>
+        [TestMethod]
+        public void ImmutableArray()
+        {
+            // 先正常创建个集合
+            var accounts = new List<string>()
+            {
+                "hello",
+                "world",
+                "a",
+                "b"
+            };
+
+            // 使用ToImmutableList扩展方法创建一个不变的集合。
+            // 也可以像其他集合那样枚举，只是不能改变。
+            ImmutableList<string> immutableList = accounts.ToImmutableList();
+            foreach (var item in immutableList)
+            {
+                Console.WriteLine(item);
+            }
         }
     }
 

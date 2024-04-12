@@ -208,165 +208,165 @@ namespace CodeSnippet.CsharpTests
 
             Assert.AreEqual(100, i);
         }
-    }
-
-    /// <summary>
-    /// 类的定义
-    /// </summary>
-    public class Person
-    {
-        // 实例成员：字段
-        private string _name;
-        private int _age;
 
         /// <summary>
-        /// 实例成员:属性
+        /// 类的定义
         /// </summary>
-        public string Name
+        public class Person
         {
-            get { return _name; }
-            set { _name = value; }
-        }
+            // 实例成员：字段
+            private string _name;
+            private int _age;
 
-        /// <summary>
-        /// 实例成员:属性(控制赋值)
-        /// </summary>
-        public int Age
-        {
-            get { return _age; }
-            set
+            /// <summary>
+            /// 实例成员:属性
+            /// </summary>
+            public string Name
             {
-                if (value > 0 && value <= 100)
+                get { return _name; }
+                set { _name = value; }
+            }
+
+            /// <summary>
+            /// 实例成员:属性(控制赋值)
+            /// </summary>
+            public int Age
+            {
+                get { return _age; }
+                set
                 {
-                    _age = value;
+                    if (value > 0 && value <= 100)
+                    {
+                        _age = value;
+                    }
                 }
             }
-        }
 
-        /// <summary>
-        /// 实例成员:自动实现的属性
-        /// </summary>
-        public string Address { get; set; }
+            /// <summary>
+            /// 实例成员:自动实现的属性
+            /// </summary>
+            public string Address { get; set; }
 
-        /// <summary>
-        /// 实例成员:只读属性
-        /// </summary>
-        public DateTime Birthday { get; }
+            /// <summary>
+            /// 实例成员:只读属性
+            /// </summary>
+            public DateTime Birthday { get; }
 
-        /// <summary>
-        /// 实例成员:只读字段
-        /// </summary>
-        public readonly string readonlyValue;
+            /// <summary>
+            /// 实例成员:只读字段
+            /// </summary>
+            public readonly string readonlyValue;
 
-        /// <summary>
-        /// 实例成员:可空类型(可以为空的值类型)
-        /// </summary>
-        public int? height;
+            /// <summary>
+            /// 实例成员:可空类型(可以为空的值类型)
+            /// </summary>
+            public int? height;
 
-        // 静态成员:只读字段
-        public readonly static string staticReadonlyValue;
+            // 静态成员:只读字段
+            public readonly static string staticReadonlyValue;
 
-        // 静态成员:字段
-        public static string _describe = "static field";
+            // 静态成员:字段
+            public static string _describe = "static field";
 
-        // 方法
-        public void PrintAge()
-        {
-            Console.WriteLine(_age);
-        }
-
-        // 如果方法实现只有一条语句,可以使用表达式体方法定义，如下所示：
-        //public void PrintAge() => Console.WriteLine(_age);
-
-        // 方法重载
-        public void Print(string message) => Console.WriteLine(message);
-
-        public void Print(string name, string messae) => Console.WriteLine($"name:{name},message:{messae}");
-
-        // 可选参数
-        public void Print(string name, string message, string address, int age = 100) => Console.WriteLine($"{name},{message},{address},{age}");
-
-        // 个数可变的参数Prams[]
-        public void Print(string name, params string[] args)
-        {
-            foreach (var item in args)
+            // 方法
+            public void PrintAge()
             {
-                Console.WriteLine($"{name}:{item}");
+                Console.WriteLine(_age);
+            }
+
+            // 如果方法实现只有一条语句,可以使用表达式体方法定义，如下所示：
+            //public void PrintAge() => Console.WriteLine(_age);
+
+            // 方法重载
+            public void Print(string message) => Console.WriteLine(message);
+
+            public void Print(string name, string messae) => Console.WriteLine($"name:{name},message:{messae}");
+
+            // 可选参数
+            public void Print(string name, string message, string address, int age = 100) => Console.WriteLine($"{name},{message},{address},{age}");
+
+            // 个数可变的参数Prams[]
+            public void Print(string name, params string[] args)
+            {
+                foreach (var item in args)
+                {
+                    Console.WriteLine($"{name}:{item}");
+                }
+            }
+
+            // out参数返回不同类型多个值
+            public string Print(string name, out bool result)
+            {
+                result = true;
+                return name;
+            }
+
+            // 构造函数：与类同名且无返回值的方法
+            public Person()
+            {
+                // 只读字段可以在构造函数中赋值
+                readonlyValue = "value from constructor";
+            }
+
+            /// <summary>
+            /// 构造函数支持重载
+            /// </summary>
+            /// <param name="name"></param>
+            public Person(string name)
+            {
+                _name = name;
+            }
+
+            /// <summary>
+            /// 构造函数初始化器
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="age"></param>
+            public Person(string name, int age) : this(name)
+            {
+                _age = age;
+            }
+
+            /// <summary>
+            /// 静态构造函数,只执行一次
+            /// </summary>
+            static Person()
+            {
+                staticReadonlyValue = "value from staticConstructor";
+            }
+
+            /// <summary>
+            /// 运算符重载
+            /// </summary>
+            /// <param name="a"></param>
+            /// <param name="b"></param>
+            /// <returns></returns>
+            public static Person operator +(Person a, Person b)
+            {
+                Person person = new()
+                {
+                    Address = a.Address + b.Address
+                };
+                return person;
             }
         }
 
-        // out参数返回不同类型多个值
-        public string Print(string name, out bool result)
+        /// <summary>
+        /// 结构定义
+        /// </summary>
+        public struct PersonStruct
         {
-            result = true;
-            return name;
-        }
-
-        // 构造函数：与类同名且无返回值的方法
-        public Person()
-        {
-            // 只读字段可以在构造函数中赋值
-            readonlyValue = "value from constructor";
+            public int Age { get; set; }
         }
 
         /// <summary>
-        /// 构造函数支持重载
+        /// 枚举定义
         /// </summary>
-        /// <param name="name"></param>
-        public Person(string name)
+        public enum Colors
         {
-            _name = name;
+            Red = 1,
+            Green = 2,
+            Blue = 3
         }
-
-        /// <summary>
-        /// 构造函数初始化器
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="age"></param>
-        public Person(string name, int age) : this(name)
-        {
-            _age = age;
-        }
-
-        /// <summary>
-        /// 静态构造函数,只执行一次
-        /// </summary>
-        static Person()
-        {
-            staticReadonlyValue = "value from staticConstructor";
-        }
-
-        /// <summary>
-        /// 运算符重载
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static Person operator +(Person a, Person b)
-        {
-            Person person = new()
-            {
-                Address = a.Address + b.Address
-            };
-            return person;
-        }
-    }
-
-    /// <summary>
-    /// 结构定义
-    /// </summary>
-    public struct PersonStruct
-    {
-        public int Age { get; set; }
-    }
-
-    /// <summary>
-    /// 枚举定义
-    /// </summary>
-    public enum Colors
-    {
-        Red = 1,
-        Green = 2,
-        Blue = 3
     }
 }
