@@ -1,5 +1,4 @@
-﻿#define Example_02
-namespace CodeSnippet.CsharpTests
+﻿namespace CodeSnippet.CsharpTests
 {
     using System;
 
@@ -10,26 +9,8 @@ namespace CodeSnippet.CsharpTests
     public class EventTests
     {
 
-#if Example_01
         [TestMethod]
-        public void Example_01()
-        {
-            Pub pub = new();
-            ServiceA serviceA = new();
-            ServiceB serviceB = new();
-
-            // 事件订阅
-            pub.OpenEvent += serviceA.ServiceAOpen;
-            pub.OpenEvent += serviceB.ServiceBOpen;
-
-            // 调用函数触发事件
-            pub.Open();
-        }
-#endif
-
-#if Example_02
-        [TestMethod]
-        public void Example_02()
+        public void Example()
         {
             Pub pub = new();
             ServiceA serviceA = new();
@@ -42,110 +23,51 @@ namespace CodeSnippet.CsharpTests
             // 调用函数触发事件
             pub.OpenConn();
         }
-#endif
-    }
 
-#if Example_01
-    /// <summary>
-    /// 发布者
-    /// </summary>
-    public class Pub
-    {
-        // 定义事件所需委托
-        public delegate void OpenEventHandler();
 
-        // 使用委托类型定义事件
-        public event OpenEventHandler OpenEvent;
-
-        /// <summary>
-        /// 定义事件触发的函数
-        /// </summary>
-        public void Open()
+        public class Pub
         {
-            // 这个简单的修改可确保在检查空值和发送通知之间，如果一个不同的线程移除了所有OpenEvent订阅者，将不会引发NullReferenceException异常
-            OpenEventHandler openEventHandler = OpenEvent;
-
-            Console.WriteLine("总服务上线...");
-            // 为确保有事件可用需要使用?.
-            OpenEvent?.Invoke();
-        }
-    }
-
-    /// <summary>
-    /// 事件订阅者A
-    /// </summary>
-    public class ServiceA
-    {
-        public void ServiceAOpen()
-        {
-            Console.WriteLine("服务A已连接");
-        }
-    }
-
-    /// <summary>
-    /// 事件订阅者B
-    /// </summary>
-    public class ServiceB
-    {
-        public void ServiceBOpen()
-        {
-            Console.WriteLine("服务B已连接");
-        }
-    }
-#endif
-
-#if Example_02
-    public class Pub
-    {
-        /// <summary>
-        /// 定义OpenEventArgs，传递给Observer所感兴趣的信息
-        /// </summary>
-        public class OpenEventArgs
-        {
-            public OpenEventArgs()
+            /// <summary>
+            /// 自定义事件参数以EventArgs结尾
+            /// </summary>
+            public class OpenEventArgs
             {
+                public OpenEventArgs()
+                {
 
+                }
+            }
+
+            // 标准事件模式委托名称以EventHandler结尾
+            // 委托的原型定义：有一个 void 返回值，并接受两个输入参数：一个 Object 类型，一个 EventArgs 类型(或继承自EventArgs)
+            public delegate void OpenEventHandler(object sender, OpenEventArgs e);
+
+            // 事件的命名为委托去掉 EventHandler 之后剩余的部分
+            public event OpenEventHandler Open;
+
+            public void OpenConn()
+            {
+                Console.WriteLine("总服务上线...");
+                OpenEventArgs e = new();
+                Open?.Invoke(this, e);
             }
         }
 
-        public delegate void OpenEventHandler(object sender, OpenEventArgs e);
-
-        public event OpenEventHandler Open;
-
-        /// <summary>
-        /// 提供继承自Pub的类重写，以便继承类拒绝其他对象对它的监视
-        /// </summary>
-        /// <param name="e"></param>
-        protected virtual void OnOpen(OpenEventArgs e)
+        public class ServiceA
         {
-            // 如果有对象注册
-            Open?.Invoke(this, e);  //调用所有注册对象的方法
+            public void ServiceAOpen(object sender, Pub.OpenEventArgs e)
+            {
+                Console.WriteLine("服务B已连接");
+            }
         }
 
-        public void OpenConn()
+        public class ServiceB
         {
-            Console.WriteLine("总服务上线...");
-            OpenEventArgs e = new();
-            OnOpen(e);
+            public void ServiceBOpen(object sender, Pub.OpenEventArgs e)
+            {
+                Console.WriteLine("服务B已连接");
+            }
         }
     }
-
-    public class ServiceA
-    {
-        public void ServiceAOpen(object sender, Pub.OpenEventArgs e)
-        {
-            Console.WriteLine("服务B已连接");
-        }
-    }
-
-    public class ServiceB
-    {
-        public void ServiceBOpen(object sender, Pub.OpenEventArgs e)
-        {
-            Console.WriteLine("服务B已连接");
-        }
-    }
-
-#endif
 }
 
