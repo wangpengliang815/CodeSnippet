@@ -1,14 +1,13 @@
 ﻿namespace CodeSnippet.CsharpTests
 {
-    using System;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using System;
 
     [TestCategory("Event")]
     [TestClass()]
     public class EventTests
     {
-
         [TestMethod]
         public void Example()
         {
