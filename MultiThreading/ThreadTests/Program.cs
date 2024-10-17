@@ -7,7 +7,7 @@
     {
         static void Main(string[] args)
         {
-            Thread_Contention_Example_02();
+            ThreadSync_Mutex_Example_01();
         }
 
         /// <summary>
@@ -303,6 +303,7 @@
             Thread t = new Thread(ThreadMethodB);
             t.Start();
             t.Join();
+
             try
             {
                 Thread t1 = new Thread(ThreadMethodA);
